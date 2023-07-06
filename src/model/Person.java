@@ -1,14 +1,18 @@
 package model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public abstract class Person {
     private String name;
     private String address;
     private String phoneNumber;
-    private LocalDate birthDate;
-
-    public Person(String name, String address, String phoneNumber, LocalDate birthDate) {
+    private Date birthDate;
+    
+    public Person(){
+        
+    }
+    
+    public Person(String name, String address, String phoneNumber, Date birthDate) {
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
@@ -39,11 +43,11 @@ public abstract class Person {
         this.phoneNumber = phoneNumber;
     }
 
-    public LocalDate getBirthDate() {
+    public Date getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 

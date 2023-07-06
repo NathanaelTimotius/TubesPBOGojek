@@ -9,6 +9,10 @@ public class Region {
         this.regionPosition = regionPosition;
     }
 
+    public Region() {
+
+    }
+
     public String getRegionName() {
         return regionName;
     }

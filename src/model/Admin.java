@@ -1,13 +1,13 @@
 package model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Admin extends Person {
     private String username;
     private String password; 
     private double income;
 
-    public Admin(String name, String username, String password, double income, String address, String phoneNumber, LocalDate birthDate) {
+    public Admin(String name, String username, String password, double income, String address, String phoneNumber, Date birthDate) {
         super(name, address, phoneNumber, birthDate);
         this.username = username;
         this.password = password;
