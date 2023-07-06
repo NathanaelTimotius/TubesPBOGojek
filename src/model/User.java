@@ -1,19 +1,23 @@
 package model;
 
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class User extends Person{
     private String email;
-    private String userID;
+    private int userID;
     private String username;
     private String password;
     private String gender;
     private double totalBalance;
     private ArrayList<Transaction> transaction;
     private Region region;
-
-    public User(String email, String userID, String username, String password, String gender, double totalBalance, ArrayList<Transaction> transaction, Region region, String name, String address, String phoneNumber, LocalDate birthDate) {
+    
+    public User(){
+        
+    }
+    
+    public User(String email, int userID, String username, String password, String gender, double totalBalance, ArrayList<Transaction> transaction, Region region, String name, String address, String phoneNumber, Date birthDate) {
         super(name, address, phoneNumber, birthDate);
         this.email = email;
         this.userID = userID;
@@ -33,11 +37,11 @@ public class User extends Person{
         this.email = email;
     }
 
-    public String getUserID() {
+    public int getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(int userID) {
         this.userID = userID;
     }
 

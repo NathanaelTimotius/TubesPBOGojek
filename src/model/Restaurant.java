@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 
 public class Restaurant {
-    private String restaurantID;
+    private int restaurantID;
     private String restaurantName;
     private String password;
     private String phoneNumber;
@@ -11,7 +11,11 @@ public class Restaurant {
     private ArrayList<Menu> listMenu;
     private double income;
 
-    public Restaurant(String restaurantID, String restaurantName, String password, String phoneNumber, Region region, ArrayList<Menu> listMenu, double income) {
+    public Restaurant (){
+        
+    }
+    
+    public Restaurant(int restaurantID, String restaurantName, String password, String phoneNumber, Region region, ArrayList<Menu> listMenu, double income) {
         this.restaurantID = restaurantID;
         this.restaurantName = restaurantName;
         this.password = password;
@@ -21,11 +25,11 @@ public class Restaurant {
         this.income = income;
     }
 
-    public String getRestaurantID() {
+    public int getRestaurantID() {
         return restaurantID;
     }
 
-    public void setRestaurantID(String restaurantID) {
+    public void setRestaurantID(int restaurantID) {
         this.restaurantID = restaurantID;
     }
 

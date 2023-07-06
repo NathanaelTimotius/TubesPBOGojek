@@ -1,6 +1,6 @@
 package model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Gojek extends Transaction {
     private Driver driver;
@@ -9,7 +9,7 @@ public class Gojek extends Transaction {
     private Region titikJemput;
     private double deliveryFee;
 
-    public Gojek(Driver driver, double distance, Region titikAntar, Region titikJemput, double deliveryFee, String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, LocalDate transactionDate, String transactionID, double adminFee) {
+    public Gojek(Driver driver, double distance, Region titikAntar, Region titikJemput, double deliveryFee, String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee) {
         super(personName, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee);
         this.driver = driver;
         this.distance = distance;

@@ -1,6 +1,6 @@
 package model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Transaction implements Service{
     private String personName;
@@ -10,11 +10,15 @@ public class Transaction implements Service{
     private double totalPrice;
     private double totalDiscount;
     private double priceAfterDiscount;
-    private LocalDate transactionDate;
-    private String transactionID;
+    private Date transactionDate;
+    private int transactionID;
     private double adminFee;
-
-    public Transaction(String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, LocalDate transactionDate, String transactionID, double adminFee) {
+    
+    public Transaction(){
+        
+    }
+    
+    public Transaction(String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee) {
         this.personName = personName;
         this.serviceID = serviceID;
         this.paymentMethod = paymentMethod;
@@ -83,19 +87,19 @@ public class Transaction implements Service{
         this.priceAfterDiscount = priceAfterDiscount;
     }
 
-    public LocalDate getTransactionDate() {
+    public Date getTransactionDate() {
         return transactionDate;
     }
 
-    public void setTransactionDate(LocalDate transactionDate) {
+    public void setTransactionDate(Date transactionDate) {
         this.transactionDate = transactionDate;
     }
 
-    public String getTransactionID() {
+    public int getTransactionID() {
         return transactionID;
     }
 
-    public void setTransactionID(String transactionID) {
+    public void setTransactionID(int transactionID) {
         this.transactionID = transactionID;
     }
 

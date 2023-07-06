@@ -1,7 +1,7 @@
 package model;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Gofood extends Transaction {
     private Driver driver;
@@ -11,7 +11,7 @@ public class Gofood extends Transaction {
     private ArrayList<Cart> cart;
     private double deliveryFee;
 
-    public Gofood(Driver driver, double distance, String restaurantName, String restaurantID, ArrayList<Cart> cart, double deliveryFee, String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, LocalDate transactionDate, String transactionID, double adminFee) {
+    public Gofood(Driver driver, double distance, String restaurantName, String restaurantID, ArrayList<Cart> cart, double deliveryFee, String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee) {
         super(personName, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee);
         this.driver = driver;
         this.distance = distance;

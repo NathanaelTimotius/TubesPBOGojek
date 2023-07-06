@@ -1,15 +1,19 @@
 package model;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Driver extends Person {
     private String NIK;
     private String password;
-    private String driverID;
+    private int driverID;
     private double income;
     private Vehicle vehicle;
-
-    public Driver(String NIK, String password, String driverID, double income, Vehicle vehicle, String name, String address, String phoneNumber, LocalDate birthDate) {
+    
+    public Driver(){
+        
+    }
+    
+    public Driver(String NIK, String password, int driverID, double income, Vehicle vehicle, String name, String address, String phoneNumber, Date birthDate) {
         super(name, address, phoneNumber, birthDate);
         this.NIK = NIK;
         this.password = password;
@@ -36,11 +40,11 @@ public class Driver extends Person {
         this.password = password;
     }
 
-    public String getDriverID() {
+    public int getDriverID() {
         return driverID;
     }
 
-    public void setDriverID(String driverID) {
+    public void setDriverID(int driverID) {
         this.driverID = driverID;
     }
 
