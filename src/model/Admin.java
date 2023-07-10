@@ -7,15 +7,15 @@ public class Admin extends Person {
     private String password; 
     private double income;
 
+    public Admin(){
+        
+    }
+    
     public Admin(String name, String username, String password, double income, String address, String phoneNumber, Date birthDate) {
         super(name, address, phoneNumber, birthDate);
         this.username = username;
         this.password = password;
         this.income = income;
-    }
-    
-    public Admin(){
-        
     }
     
     public String getUsername() {
