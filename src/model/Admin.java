@@ -14,6 +14,10 @@ public class Admin extends Person {
         this.income = income;
     }
     
+    public Admin(){
+        
+    }
+    
     public String getUsername() {
         return username;
     }
