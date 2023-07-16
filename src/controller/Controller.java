@@ -5,37 +5,33 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import model.Admin;
-import model.Driver;
-import model.Region;
-import model.Restaurant;
-import model.Transaction;
-import model.User;
+import model.*;
 
 public class Controller {
     DatabaseHandler conn = new DatabaseHandler();
-
+    
     // SELECT ALL 
     public  ArrayList<User> getAllUsers() {
         ArrayList<User> users = new ArrayList<>();
         conn.connect();
-        String query = "SELECT * FROM users";
+        String query = "SELECT * FROM user";
         try {
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 User user = new User();
-                user.setUserID(rs.getInt("Id_User"));
-                user.setName(rs.getString("Name"));
-                user.setAddress(rs.getString("Address"));
-                user.setPhoneNumber(rs.getString("Phone_number"));
-                user.setBirthDate(rs.getDate("Birth_date"));
-                user.setUsername(rs.getString("Username"));
-                user.setEmail(rs.getString("Email"));
-                user.setPassword(rs.getString("Password"));
-                user.setGender(rs.getString("Gender"));
-                user.setTotalBalance(rs.getDouble("Total_balance"));
-                user.setRegion(getRegion(rs.getInt("Id_Region")));
+                user.setUserID(rs.getInt("id_User"));
+                user.setName(rs.getString("name"));
+                user.setAddress(rs.getString("address"));
+                user.setPhoneNumber(rs.getString("phoneNumber"));
+                user.setBirthDate(rs.getDate("birthDate"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setGender(rs.getString("gender"));
+                user.setTotalBalance(rs.getDouble("totalBalance"));
+                user.setRegion(getRegion(rs.getInt("id_Region")));
+                user.setTransaction(getAllTransactionPerUser(rs.getInt("id_transaksi")));
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -48,22 +44,21 @@ public class Controller {
     public  ArrayList<Transaction> getAllTransactionPerUser(int Id_User) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         conn.connect();
-        String query = "SELECT * FROM transaction WHERE id_user='" + Id_User + "'";
+        String query = "SELECT * FROM transaksi WHERE id_user='" + Id_User + "'";
         try {
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 Transaction transaction = new Transaction();
-                transaction.setPersonName(rs.getString("person_name"));
-//                transaction.setServiceID();
-//                transaction.setPaymentMethod();
+                transaction.setTransactionID(rs.getInt("id_transaksi"));
 //                transaction.setVoucher();
-                transaction.setTotalPrice(rs.getDouble("total_price"));
-                transaction.setTotalDiscount(rs.getDouble("total_discount"));
-                transaction.setPriceAfterDiscount(rs.getDouble("price_after_discount"));
-                transaction.setTransactionDate(rs.getDate("transaction_date"));
-                transaction.setTransactionID(rs.getInt("transaction_id"));
-                transaction.setAdminFee(rs.getDouble("admin_fee"));
+//                transaction.setServiceID(rs.getInt("id_transaksi"));
+//                transaction.setPaymentMethod();
+                transaction.setTotalPrice(rs.getDouble("totalPrice"));
+                transaction.setAdminFee(rs.getDouble("adminFee"));
+                transaction.setTotalDiscount(rs.getDouble("totalDiscount"));
+                transaction.setPriceAfterDiscount(rs.getDouble("finalPrice"));
+                transaction.setTransactionDate(rs.getDate("transactionDate"));
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
@@ -117,36 +112,83 @@ public class Controller {
         return (driver);
     }
     
-    public Restaurant getRestaurant(String name, String password) {
+    public ArrayList<Restaurant> getAllRestoran() {
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
         conn.connect();
-        String query = "SELECT * FROM users WHERE Restaurant_name='" + name + "'&&Password='" + password + "'";
-        Restaurant restaurant = new Restaurant();
+        String query = "SELECT * FROM restoran";
         try {
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                restaurant.setRestaurantID(rs.getInt("Id_Restoran"));
-                restaurant.setRestaurantName(rs.getString("Restaurant_name"));
-                restaurant.setPassword(rs.getString("Password"));
-                restaurant.setIncome(rs.getDouble("Income"));
-                restaurant.setPhoneNumber(rs.getString("phone_number"));
+                Restaurant resto = new Restaurant();
+                resto.setRestaurantID(rs.getInt("id_restoran"));
+                resto.setRestaurantName(rs.getString("restaurantName"));
+                resto.setPassword(rs.getString("password"));
+                resto.setPhoneNumber(rs.getString("phoneNumber"));
+                resto.setRegion(getRegion(rs.getInt("id_region")));
+                resto.setListMenu(getMenuRestoran(rs.getInt("id_restoran")));
+                resto.setIncome(rs.getDouble("income"));
+                restaurants.add(resto);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return (restaurant);
+        return (restaurants);
+    }
+    
+    public ArrayList<Menu> getMenuRestoran(int idRestoran){
+        ArrayList<Menu> menus = new ArrayList<>();
+        conn.connect();
+        String query = "SELECT * FROM restoran_menu";
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                
+                if (rs.getInt("id_restoran") == idRestoran){
+                    Menu menu = getMenu(rs.getInt("id_menu"));
+                    menus.add(menu);
+                }
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (menus);
+    }
+    
+    public Menu getMenu(int idMenu){
+        conn.connect();
+        String query = "SELECT * FROM menu WHERE id_menu ='" + idMenu + "'";
+        Menu menu = new Menu();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                menu.setMenuName(rs.getString("menuName"));
+                if (rs.getString("menuType").equals(MenuType.FOOD)){
+                    menu.setMenuType(MenuType.FOOD);
+                } else {
+                    menu.setMenuType(MenuType.DRINK);
+                }
+                menu.setPrice(rs.getInt("price"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (menu);
     }
     
     public Region getRegion(int Id_region){
         conn.connect();
-        String query = "SELECT * FROM region WHERE Id_Restoran='" + Id_region + "'";
+        String query = "SELECT * FROM region WHERE id_region ='" + Id_region + "'";
         Region region = new Region();
         try {
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
-                region.setRegionName(rs.getString("region_name"));
-                region.setRegionPosition(rs.getInt("region_position"));
+                region.setRegionName(rs.getString("regionName"));
+                region.setRegionPosition(rs.getInt("regionPosition"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

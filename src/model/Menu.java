@@ -3,9 +3,13 @@ package model;
 public class Menu {
     private String menuName;
     private MenuType menuType;
-    private String price;
-
-    public Menu(String menuName, MenuType menuType, String price) {
+    private int price;
+    
+    public Menu(){
+        
+    }
+    
+    public Menu(String menuName, MenuType menuType, int price) {
         this.menuName = menuName;
         this.menuType = menuType;
         this.price = price;
@@ -27,11 +31,11 @@ public class Menu {
         this.menuType = menuType;
     }
 
-    public String getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
