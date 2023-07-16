@@ -5,8 +5,9 @@ import view.*;
 public class Main {
     
     public static void main(String[] args) {
-        
-        new LoginScreen();
+//        new MainMenuScreen();
+//        new LoginScreen();
+        new UserScreen();
         
     }
     

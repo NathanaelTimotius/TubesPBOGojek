@@ -31,22 +31,22 @@ public class UserScreen {
 
         JButton gojekButton = createIconButton("Gojek",
                 "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40);
+                100, 40, frame);
         buttonPanel.add(gojekButton);
 
         JButton gocarButton = createIconButton("Gocar",
                 "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40);
+                100, 40, frame);
         buttonPanel.add(gocarButton);
 
         JButton gofoodButton = createIconButton("Gofood",
                 "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40);
+                100, 40, frame);
         buttonPanel.add(gofoodButton);
 
         JButton gosendButton = createIconButton("Gosend",
                 "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40);
+                100, 40, frame);
         buttonPanel.add(gosendButton);
 
         mainPanel.add(profilePanel, BorderLayout.NORTH);
@@ -56,7 +56,7 @@ public class UserScreen {
         frame.setVisible(true);
     }
 
-    private static JButton createIconButton(String text, String iconName, int width, int height) {
+    private static JButton createIconButton(String text, String iconName, int width, int height, JFrame frame) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 10));
         button.setForeground(Color.WHITE);
@@ -73,6 +73,11 @@ public class UserScreen {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, "Anda memilih: " + text);
+                frame.dispose();
+                if (text.equals("Gofood")){
+                    new GoFoodScreen();
+                }
+                
             }
         });
 
