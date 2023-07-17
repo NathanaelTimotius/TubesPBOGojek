@@ -1,8 +1,14 @@
 package view;
 
+import controller.Controller;
 import controller.ControllerView;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.*;
+import model.Menu;
+import model.Restaurant;
 
 public class GoFoodScreen {
     
@@ -12,6 +18,7 @@ public class GoFoodScreen {
     
     public void showGoFoodScreen(){
         ControllerView cv = new ControllerView();
+        Controller con = new Controller();
         
         JFrame frame = new JFrame("Go Food");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,22 +36,28 @@ public class GoFoodScreen {
         restaurantPanel.setAlignmentX(Component.CENTER_ALIGNMENT); 
         restaurantPanel.add(Box.createVerticalGlue());
         
+        
+        ArrayList<Restaurant> resto = con.getAllRestoran();
+        JButton buttons[] = new JButton[resto.size()];
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = cv.CreateRestoranButton(resto.get(i).getRestaurantName());
+            ArrayList<Menu> listMenu = resto.get(i).getListMenu();
+            
+            buttons[i].addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e){
+                    frame.dispose();
+                    new MenuScreen(listMenu);
+                }
+            });
+            
+            restaurantPanel.add(buttons[i]);
+            restaurantPanel.add(Box.createVerticalStrut(10));
+        }
 
-        // Create buttons for each restaurant
-        JButton button1 = cv.CreateRestoranButton("Restaurant 1");
-        JButton button2 = cv.CreateRestoranButton("Restaurant 2");
-        JButton button3 = cv.CreateRestoranButton("Restaurant 3");
-        
-        
-        restaurantPanel.add(button1);
-        restaurantPanel.add(Box.createVerticalStrut(10)); // Add vertical gap between buttons
-        restaurantPanel.add(button2);
-        restaurantPanel.add(Box.createVerticalStrut(10)); // Add vertical gap between buttons
-        restaurantPanel.add(button3);
         restaurantPanel.add(Box.createVerticalGlue());
 
-        JScrollPane scrollPane = new JScrollPane(restaurantPanel); // Wrap the restaurant panel in a scroll pane
-
+        JScrollPane scrollPane = new JScrollPane(restaurantPanel); 
+        
         mainPanel.add(title, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
