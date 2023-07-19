@@ -1,6 +1,5 @@
 package controller;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,7 +19,9 @@ public class Controller {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 User user = new User();
-                user.setUserID(rs.getInt("id_User"));
+                user.setUserID(rs.getInt("id_user"));
+                user.setTransaction(getAllTransactionPerUser(rs.getInt("id_transaksi")));
+                user.setRegion(getRegion(rs.getInt("id_Region")));
                 user.setName(rs.getString("name"));
                 user.setAddress(rs.getString("address"));
                 user.setPhoneNumber(rs.getString("phoneNumber"));
@@ -30,8 +31,8 @@ public class Controller {
                 user.setPassword(rs.getString("password"));
                 user.setGender(rs.getString("gender"));
                 user.setTotalBalance(rs.getDouble("totalBalance"));
-                user.setRegion(getRegion(rs.getInt("id_Region")));
-                user.setTransaction(getAllTransactionPerUser(rs.getInt("id_transaksi")));
+                
+                
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -51,14 +52,18 @@ public class Controller {
             while (rs.next()) {
                 Transaction transaction = new Transaction();
                 transaction.setTransactionID(rs.getInt("id_transaksi"));
-//                transaction.setVoucher();
-//                transaction.setServiceID(rs.getInt("id_transaksi"));
-//                transaction.setPaymentMethod();
+                transaction.setVoucher(getVoucher(rs.getInt("id_voucher")));
+                transaction.setServiceID(rs.getInt("id_transaksi"));
                 transaction.setTotalPrice(rs.getDouble("totalPrice"));
                 transaction.setAdminFee(rs.getDouble("adminFee"));
                 transaction.setTotalDiscount(rs.getDouble("totalDiscount"));
                 transaction.setPriceAfterDiscount(rs.getDouble("finalPrice"));
                 transaction.setTransactionDate(rs.getDate("transactionDate"));
+                if(rs.getString("paymentMethod").equals(PaymentMethod.CASH)){
+                    transaction.setPaymentMethod(PaymentMethod.CASH);
+                } else {
+                    transaction.setPaymentMethod(PaymentMethod.GOPAY);
+                }
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
@@ -66,8 +71,25 @@ public class Controller {
         }
         return (transactions);
     }
-
-    // SELECT WHERE
+    
+    public Voucher getVoucher(int id_voucher){
+        conn.connect();
+        String query = "SELECT * FROM voucher WHERE id_voucher='" + id_voucher + "'";
+        Voucher voucher = new Voucher();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                voucher.setVoucherID(rs.getInt("id_voucher"));
+                voucher.setVoucherName(rs.getString("voucherName"));
+                voucher.setDiscountPercentage(rs.getDouble("discountPercentage"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (voucher);
+    }
+    
     public User getUser(String name, String address) {
         conn.connect();
         String query = "SELECT * FROM users WHERE Name='" + name + "'&&Address='" + address + "'";
@@ -196,22 +218,11 @@ public class Controller {
         return (region);
     }
     
-    public Region getServiceID(int Id_region){
-        conn.connect();
-        String query = "SELECT * FROM region WHERE Id_Restoran='" + Id_region + "'";
-        Region region = new Region();
-        try {
-            Statement stmt = conn.con.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                region.setRegionName(rs.getString("region_name"));
-                region.setRegionPosition(rs.getInt("region_position"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return (region);
-    }
+//    public Service getServiceID(int serviceID){
+//        if (serviceID == Service.GOCAR){
+//            Service service = new GocarService();
+//        }
+//    }
     
     
 }

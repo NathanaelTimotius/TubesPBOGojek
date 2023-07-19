@@ -2,8 +2,12 @@ package model;
 
 public class Voucher {
     private String voucherName;
-    private String voucherID;
+    private int voucherID;
     private double discountPercentage;
+
+    public Voucher() {
+
+    }
 
     public Voucher(String voucherName, String voucherID, double discountPercentage) {
         this.voucherName = voucherName;
@@ -37,8 +41,8 @@ public class Voucher {
 
     @Override
     public String toString() {
-        return "Voucher{" + "voucherName=" + voucherName + ", voucherID=" + voucherID + ", discountPercentage=" + discountPercentage + '}';
+        return "Voucher{" + "voucherName=" + voucherName + ", voucherID=" + voucherID + ", discountPercentage="
+                + discountPercentage + '}';
     }
-    
-    
+
 }
