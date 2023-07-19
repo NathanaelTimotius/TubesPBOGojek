@@ -9,7 +9,7 @@ public class Voucher {
 
     }
 
-    public Voucher(String voucherName, String voucherID, double discountPercentage) {
+    public Voucher(String voucherName, int voucherID, double discountPercentage) {
         this.voucherName = voucherName;
         this.voucherID = voucherID;
         this.discountPercentage = discountPercentage;
@@ -23,11 +23,11 @@ public class Voucher {
         this.voucherName = voucherName;
     }
 
-    public String getVoucherID() {
+    public int getVoucherID() {
         return voucherID;
     }
 
-    public void setVoucherID(String voucherID) {
+    public void setVoucherID(int voucherID) {
         this.voucherID = voucherID;
     }
 

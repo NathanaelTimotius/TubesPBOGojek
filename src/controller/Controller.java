@@ -53,7 +53,7 @@ public class Controller {
                 Transaction transaction = new Transaction();
                 transaction.setTransactionID(rs.getInt("id_transaksi"));
                 transaction.setVoucher(getVoucher(rs.getInt("id_voucher")));
-                transaction.setServiceID(rs.getInt("id_transaksi"));
+//                transaction.setServiceID(rs.getInt("id_transaksi"));
                 transaction.setTotalPrice(rs.getDouble("totalPrice"));
                 transaction.setAdminFee(rs.getDouble("adminFee"));
                 transaction.setTotalDiscount(rs.getDouble("totalDiscount"));
@@ -70,6 +70,25 @@ public class Controller {
             e.printStackTrace();
         }
         return (transactions);
+    }
+    
+    public ArrayList<Region> getAllRegion(){
+        conn.connect();
+        String query = "SELECT * FROM region";
+        ArrayList<Region> regions = new ArrayList<>();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Region region = new Region();
+                region.setRegionName(rs.getString("regionName"));
+                region.setRegionPosition(rs.getInt("regionPosition"));
+                regions.add(region);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (regions);
     }
     
     public Voucher getVoucher(int id_voucher){
