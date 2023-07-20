@@ -3,12 +3,12 @@ package main;
 import view.*;
 
 public class Main {
-    
+
     public static void main(String[] args) {
-    //    new MainMenuScreen();
-//       new LoginScreen();
-         new UserScreen();
-        
+        // new MainMenuScreen();
+        // new LoginScreen();
+        new UserScreen();
+
     }
-    
+
 }
