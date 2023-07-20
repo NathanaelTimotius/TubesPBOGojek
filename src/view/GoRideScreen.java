@@ -3,12 +3,18 @@ package view;
 import javax.swing.*;
 
 import controller.GoRideController;
+import model.OrderStatus;
 import model.User;
+import model.PaymentMethod;
+import model.Service;
 import model.Region;
+import model.Transaction;
+import model.Voucher;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 import java.util.ArrayList;
 
 public class GoRideScreen {
@@ -16,6 +22,9 @@ public class GoRideScreen {
     private JFrame frame;
     private JLabel nameLabel;
     private JLabel balanceLabel;
+    private ArrayList<Region> regions;
+    private JTextField pickupField;
+    private JTextField destinationField;
 
     public GoRideScreen(User user) {
         currentUser = user;
@@ -45,6 +54,7 @@ public class GoRideScreen {
         goRideButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                frame.dispose();
                 showGoRidePage();
             }
         });
@@ -53,7 +63,7 @@ public class GoRideScreen {
     public void showGoRidePage() {
         frame = new JFrame("GoRide - GoJek");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(350, 500);
+        frame.setSize(350, 600);
         frame.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
@@ -73,7 +83,7 @@ public class GoRideScreen {
         gb.weightx = 0;
         gb.anchor = GridBagConstraints.WEST;
         int countY = 1;
-        ArrayList<Region> regions = new GoRideController().getAllRegions();
+        regions = new GoRideController().getAllRegions();
         for(Region region : regions){
             gb.gridx = 0;
             gb.gridy = countY;
@@ -92,22 +102,14 @@ public class GoRideScreen {
         panel.add(new JLabel(), gb);
         countY++;
 
-        gb.gridx = 0;
-        gb.gridy = countY;
-        gb.anchor = GridBagConstraints.WEST;
-        JLabel nameLabel = new JLabel("Nama:");
-        panel.add(nameLabel, gb);
-        gb.gridx = 1;
-        JTextField nameField = new JTextField();
-        panel.add(nameField, gb);
-
         countY++;
         gb.gridx = 0;
         gb.gridy = countY;
+        gb.anchor = GridBagConstraints.WEST;
         JLabel pickupLabel = new JLabel("Lokasi Penjemputan:");
         panel.add(pickupLabel, gb);
         gb.gridx = 1;
-        JTextField pickupField = new JTextField();
+        pickupField = new JTextField();
         panel.add(pickupField, gb);
 
         countY++;
@@ -116,8 +118,36 @@ public class GoRideScreen {
         JLabel destinationLabel = new JLabel("Tujuan:");
         panel.add(destinationLabel, gb);
         gb.gridx = 1;
-        JTextField destinationField = new JTextField();
+        destinationField = new JTextField();
         panel.add(destinationField, gb);
+
+        countY++;
+        gb.gridx = 0;
+        gb.gridy = countY;
+        JLabel voucherLabel = new JLabel("Voucher:");
+        panel.add(voucherLabel, gb);
+        gb.gridx = 1;
+        JTextField voucherField = new JTextField();
+        panel.add(voucherField, gb);
+
+        countY++;
+        gb.gridx = 0;
+        gb.gridy = countY;
+        JLabel paymentLabel = new JLabel("Metode Pembayaran:");
+        panel.add(paymentLabel, gb);
+        gb.gridx = 1;
+        JRadioButton gopayButton = new JRadioButton("GOPAY");
+        gopayButton.setActionCommand("GOPAY");
+        JRadioButton cashButton = new JRadioButton("CASH");
+        cashButton.setActionCommand("CASH");
+        ButtonGroup paymentButtonGroup = new ButtonGroup();
+        paymentButtonGroup.add(gopayButton);
+        paymentButtonGroup.add(cashButton);
+        JPanel paymentPanel = new JPanel();
+        paymentPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        paymentPanel.add(gopayButton);
+        paymentPanel.add(cashButton);
+        panel.add(paymentPanel, gb);
 
         countY++;
         gb.gridy = countY;
@@ -132,28 +162,68 @@ public class GoRideScreen {
         orderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String name = nameField.getText();
-                String pickupLocation = pickupField.getText();
-                String destination = destinationField.getText();
+                int pickupLocation = Integer.parseInt(pickupField.getText());
+                int destination = Integer.parseInt(destinationField.getText());
+                PaymentMethod paymentMethod = PaymentMethod.valueOf((String)paymentButtonGroup.getSelection().getActionCommand());
+                Voucher voucher;
+                if (voucherField.getText().isEmpty()){
+                    voucher = null;
+                } else {
+                    voucher = new Voucher();
+                    voucher.setVoucherName(voucherField.getText());
+                }
 
-                // Panggil metode untuk memesan GoRide dengan data yang diinput pengguna
-                orderGoRide(name, pickupLocation, destination);
+                double totalPrice = 0;
+                if(destination > pickupLocation) {
+                    totalPrice = 5000 + (7000 * (destination - pickupLocation));
+                } else {
+                    totalPrice = 5000 + (7000 * (pickupLocation - destination));
+                }
+                
+                double totalDiscount = 0;
+                double priceAfterDiscount = totalPrice - totalDiscount;
+                Date now = new Date();
+
+                double adminFee = 2000;
+
+                Transaction transaction = new Transaction(currentUser.getUserID(), Service.GORIDE, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, now, 0, adminFee, OrderStatus.PENDING);
+
+                orderGoRide(transaction);
             }
         });
     }
 
-    public void orderGoRide(String name, String pickupLocation, String destination) {
+    public void orderGoRide(Transaction transaction) {
         // Logika bisnis untuk memesan GoRide
-
-        // Contoh: Tampilkan pesan konfirmasi dengan informasi pemesanan
         String confirmationMessage = "Pemesanan GoRide sukses!\n" +
-                "Nama: " + name + "\n" +
-                "Lokasi Penjemputan: " + pickupLocation + "\n" +
-                "Tujuan: " + destination;
-        JOptionPane.showMessageDialog(frame, confirmationMessage);
+                "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName() + "\n" +
+                "Tujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName() + "\n" +
+                "Total Pembayaran: " + transaction.getPriceAfterDiscount() + "\n" +
+                "Metode Pembayaran: " + transaction.getPaymentMethod().name();
+        int confirm = JOptionPane.showConfirmDialog(frame, confirmationMessage, "Confirmation", JOptionPane.YES_NO_OPTION);
 
-        // Hapus tampilan GoRide setelah pesanan selesai
-        frame.dispose();
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean berhasil = new GoRideController().insertGoRideTransaction(transaction);
+            if (berhasil) {
+                if (transaction.getPaymentMethod() == PaymentMethod.GOPAY){
+                    if (currentUser.getTotalBalance() >= transaction.getPriceAfterDiscount()){
+                        currentUser.setTotalBalance(currentUser.getTotalBalance() - transaction.getPriceAfterDiscount());
+                        new GoRideController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
+                        JOptionPane.showMessageDialog(frame, "Pembayaran berhasil \nSisa GOPAY: " + currentUser.getTotalBalance());
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Saldo GOPAY tidak cukup");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
+            }
+            frame.dispose();
+            showMainPage();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Cancel pemesanan");
+        }       
     }
 
     public static void main(String[] args) {

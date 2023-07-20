@@ -3,8 +3,8 @@ package model;
 import java.util.Date;
 
 public class Transaction implements Service{
-    private String personName;
-    private Service serviceID;
+    private int userID;
+    private int serviceID;
     private PaymentMethod paymentMethod;
     private Voucher voucher;
     private double totalPrice;
@@ -13,13 +13,14 @@ public class Transaction implements Service{
     private Date transactionDate;
     private int transactionID;
     private double adminFee;
+    private OrderStatus orderStatus;
     
     public Transaction(){
         
     }
     
-    public Transaction(String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee) {
-        this.personName = personName;
+    public Transaction(int userID, int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee, OrderStatus orderStatus) {
+        this.userID = userID;
         this.serviceID = serviceID;
         this.paymentMethod = paymentMethod;
         this.voucher = voucher;
@@ -29,21 +30,22 @@ public class Transaction implements Service{
         this.transactionDate = transactionDate;
         this.transactionID = transactionID;
         this.adminFee = adminFee;
+        this.orderStatus = orderStatus;
     }
 
-    public String getPersonName() {
-        return personName;
+    public int getUserID() {
+        return userID;
     }
 
-    public void setPersonName(String personName) {
-        this.personName = personName;
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 
-    public Service getServiceID() {
+    public int getServiceID() {
         return serviceID;
     }
 
-    public void setServiceID(Service serviceID) {
+    public void setServiceID(int serviceID) {
         this.serviceID = serviceID;
     }
 
@@ -111,9 +113,17 @@ public class Transaction implements Service{
         this.adminFee = adminFee;
     }
 
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     @Override
     public String toString() {
-        return "Transaction{" + "personName=" + personName + ", serviceID=" + serviceID + ", paymentMethod=" + paymentMethod + ", voucher=" + voucher + ", totalPrice=" + totalPrice + ", totalDiscount=" + totalDiscount + ", priceAfterDiscount=" + priceAfterDiscount + ", transactionDate=" + transactionDate + ", transactionID=" + transactionID + ", adminFee=" + adminFee + '}';
+        return "Transaction{" + "userID=" + userID + ", serviceID=" + serviceID + ", paymentMethod=" + paymentMethod + ", voucher=" + voucher + ", totalPrice=" + totalPrice + ", totalDiscount=" + totalDiscount + ", priceAfterDiscount=" + priceAfterDiscount + ", transactionDate=" + transactionDate + ", transactionID=" + transactionID + ", adminFee=" + adminFee + '}';
     }
     
     
