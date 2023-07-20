@@ -47,11 +47,12 @@ public class GoFoodScreen {
             buttons[i].setFont(new Font("Arial", Font.BOLD, 18));
             
             ArrayList<Menu> listMenu = resto.get(i).getListMenu();
+            int idRegionRestoran = resto.get(i).getRestaurantID();
             
             buttons[i].addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
                     frame.dispose();
-                    showMenuScreen(listMenu);
+                    showMenuScreen(listMenu, idRegionRestoran);
                 }
             });
             
@@ -82,7 +83,7 @@ public class GoFoodScreen {
 
     }
     
-    public void showMenuScreen(ArrayList<Menu> listMenu){ 
+    public void showMenuScreen(ArrayList<Menu> listMenu, int idRegionRestoran){ 
         JFrame frame = new JFrame("Go Food");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
@@ -144,7 +145,7 @@ public class GoFoodScreen {
                         }
                     }
                     frame.dispose();
-                    showFormPengirimanGoFood(listMenu);
+                    showFormPengirimanGoFood(listMenu, listCart, idRegionRestoran);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Input Invalid", "Peringatan", JOptionPane.WARNING_MESSAGE);
                 }
@@ -176,22 +177,102 @@ public class GoFoodScreen {
         mainPanel.add(title, BorderLayout.NORTH);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
-        
         frame.add(mainPanel);
         frame.setVisible(true);
     }
     
-    public void showFormPengirimanGoFood(ArrayList<Menu> listMenu){
+    public void showFormPengirimanGoFood(ArrayList<Menu> listMenu, ArrayList<Cart> listCart, int idRegionRestoran){
         Controller con = new Controller();
         ArrayList<Region> allRegion = con.getAllRegion();
-        String text = "";
+        String text = "Pilih alamat anda : \n";
         for (int i = 0; i < allRegion.size(); i++) {
             text +=  (i+1) + ". " + allRegion.get(i).getRegionName() + "\n";
         }
         String temp = JOptionPane.showInputDialog(null, text, "Region", JOptionPane.QUESTION_MESSAGE);
         if (temp == null) {
-            showMenuScreen(listMenu);
+            showMenuScreen(listMenu, idRegionRestoran);
+        } else {
+            int tempRegion = Integer.parseInt(temp);
+            JFrame frame = new JFrame("Go Food");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(400, 400);
+            frame.setLocationRelativeTo(null);
+            
+            int biayaOngkir =  con.getBiayaOngkir(tempRegion, idRegionRestoran);
+            int biayaMenu = con.getBiayaMenu(listCart);
+            
+            JPanel mainPanel = new JPanel(new BorderLayout());
+            
+            JLabel title = new JLabel("Pembayaran");
+            title.setFont(new Font("Arial", Font.BOLD, 18));
+            title.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            JPanel paymentPanel = new JPanel();
+            paymentPanel.add(Box.createVerticalGlue());
+
+
+            JLabel biayaOngkirLabel = new JLabel("Biaya Ongkir: " + biayaOngkir);
+            JLabel biayaMenuLabel = new JLabel("Biaya Menu: " + biayaMenu);
+            
+            
+            JPanel inputPanel = new JPanel();
+
+            JLabel voucherLabel = new JLabel("Voucher: ");
+            JTextField voucherField = new JTextField(10);
+            
+            double totalBiaya = con.getTotalBiaya(biayaOngkir, biayaMenu, "");
+            JLabel totalBiayaLabel = new JLabel("Total Biaya: " + con.getTotalBiaya(biayaOngkir, biayaMenu, ""));
+            
+            JButton calculateButton = new JButton("Calculate");
+            calculateButton.addActionListener(e -> {
+                try {
+                    String voucher = voucherField.getText();
+                    double newTotalBiaya = con.getTotalBiaya(biayaOngkir, biayaMenu, voucher);
+                    totalBiayaLabel.setText("Total Biaya: " + newTotalBiaya);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(frame, "Voucher Invalid", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                }
+            });
+            
+            JButton orderButton = new JButton("Order");
+            orderButton.setPreferredSize(new Dimension(300, 50)); 
+            orderButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            orderButton.setMaximumSize(new Dimension(300, 50)); 
+            orderButton.setFont(new Font("Arial", Font.BOLD, 18));
+            orderButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String labelText = totalBiayaLabel.getText();
+                    String numericPart = labelText.substring(labelText.lastIndexOf(":") + 2);
+                    double totalBiayaValue = Double.parseDouble(numericPart);
+                    
+                    
+                }
+            });
+            JButton backButton =  new JButton("Kembali");
+            backButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    frame.dispose();
+                    showMenuScreen(listMenu, idRegionRestoran);
+                }
+            });
+            
+            paymentPanel.add(biayaOngkirLabel);
+            paymentPanel.add(biayaMenuLabel);
+            inputPanel.add(voucherLabel);
+            inputPanel.add(voucherField);
+            inputPanel.add(calculateButton);
+            paymentPanel.add(inputPanel);
+            paymentPanel.add(totalBiayaLabel);
+            paymentPanel.add(orderButton);
+            paymentPanel.add(backButton);
+            paymentPanel.add(Box.createVerticalGlue());
+
+            mainPanel.add(title, BorderLayout.NORTH);
+            mainPanel.add(paymentPanel, BorderLayout.CENTER);
+
+            frame.add(mainPanel);
+            frame.setVisible(true);
         }
-        int menu = Integer.parseInt(temp);
+        
     }
 }

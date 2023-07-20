@@ -91,6 +91,26 @@ public class Controller {
         return (regions);
     }
     
+    public ArrayList<Voucher> getAllVoucher(){
+        conn.connect();
+        String query = "SELECT * FROM voucher";
+        ArrayList<Voucher> vouchers = new ArrayList<>();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Voucher voucher = new Voucher();
+                voucher.setVoucherID(rs.getInt("id_voucher"));
+                voucher.setVoucherName(rs.getString("voucherName"));
+                voucher.setDiscountPercentage(rs.getDouble("discountPercentage"));
+                vouchers.add(voucher);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (vouchers);
+    }
+    
     public Voucher getVoucher(int id_voucher){
         conn.connect();
         String query = "SELECT * FROM voucher WHERE id_voucher='" + id_voucher + "'";
@@ -242,6 +262,39 @@ public class Controller {
 //            Service service = new GocarService();
 //        }
 //    }
+
+    public int getBiayaOngkir(int tempRegion, int idRegionRestoran){
+        int biayaOngkir = 5000;
+        if (tempRegion > idRegionRestoran){
+           biayaOngkir += 10000 * (tempRegion - idRegionRestoran);
+        } else {
+            biayaOngkir += 1000 * (idRegionRestoran - tempRegion);
+        }
+        return biayaOngkir;
+    }
     
+    public int getBiayaMenu(ArrayList<Cart> listCart){
+        int biayaMenu = 0;
+        
+        for (Cart cart : listCart) {
+            biayaMenu = cart.getMenu().getPrice() * cart.getQuantity();
+        }
+        
+        return biayaMenu;
+    }
     
+    public double getTotalBiaya(int biayaOngkir, int biayaMenu, String voucherName){
+        double totalBiaya = biayaOngkir + biayaMenu;
+        if (voucherName.equals("")){
+            return totalBiaya;
+        } else {
+            ArrayList<Voucher> listVoucher = getAllVoucher();
+            for (Voucher voucher : listVoucher) {
+                if (voucher.getVoucherName().equals(voucherName)) {
+                    totalBiaya -= (totalBiaya * voucher.getDiscountPercentage() / 100.0);
+                }
+            }
+            return totalBiaya;
+        }
+    }
 }
