@@ -105,10 +105,10 @@ public class GoSendScreen{
     }
 
     public void orderGoSend(String name, String name2, String pickupLocation, String destination) {
-        // Logika bisnis untuk memesan GoRide
+        // Logika bisnis untuk memesan GoSend
 
         // Contoh: Tampilkan pesan konfirmasi dengan informasi pemesanan
-        String confirmationMessage = "Pemesanan GoRide sukses!\n" +
+        String confirmationMessage = "Pemesanan GoSend sukses!\n" +
                 "Nama Pengirim: " + name + "\n" +
                 "Nama Terkirim: " + name2 + "\n" +
                 "Lokasi Penjemputan: " + pickupLocation + "\n" +
