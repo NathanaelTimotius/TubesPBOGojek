@@ -5,32 +5,32 @@ import java.util.Date;
 public class Gosend extends Transaction {
     private Driver driver;
     private double distance;
-    private String item;
-    private String terima;
-    private int titikAntar;
-    private int titikJemput;
+    private String item;// Nama Item
+    private String receiverName; // Nama penerima
+    private int pickupLocation; // Titik jemput
+    private int destination; // Titik antar
 
     public Gosend() {
 
     }
 
-    public Gosend(Driver driver, double distance, String item, String terima, int titikAntar, int titikJemput) {
+    public Gosend(Driver driver, double distance, String item, String receiverName, int pickupLocation, int destination) {
         this.driver = driver;
         this.distance = distance;
         this.item = item;
-        this.terima = terima;
-        this.titikAntar = titikAntar;
-        this.titikJemput = titikJemput;
+        this.receiverName = receiverName;
+        this.pickupLocation = pickupLocation;
+        this.destination = destination;
     }
 
-    public Gosend(Driver driver, double distance, String item, String terima, int titikAntar, int titikJemput, int userID, int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee, OrderStatus orderStatus) {
+    public Gosend(Driver driver, double distance, String item, String receiverName, int pickupLocation, int destination, int userID, int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee, OrderStatus orderStatus) {
         super(userID, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee, orderStatus);
         this.driver = driver;
         this.distance = distance;
         this.item = item;
-        this.terima = terima;
-        this.titikAntar = titikAntar;
-        this.titikJemput = titikJemput;
+        this.receiverName = receiverName;
+        this.pickupLocation = pickupLocation;
+        this.destination = destination;
     }
 
     public Driver getDriver() {
@@ -57,32 +57,39 @@ public class Gosend extends Transaction {
         this.item = item;
     }
 
-    public String getTerima() {
-        return terima;
+    public String getReceiverName() {
+        return receiverName;
     }
 
-    public void setTerima(String terima) {
-        this.terima = terima;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
-    public int getTitikAntar() {
-        return titikAntar;
+    public int getPickupLocation() {
+        return pickupLocation;
     }
 
-    public void setTitikAntar(int titikAntar) {
-        this.titikAntar = titikAntar;
+    public void setPickupLocation(int pickupLocation) {
+        this.pickupLocation = pickupLocation;
     }
 
-    public int getTitikJemput() {
-        return titikJemput;
+    public int getDestination() {
+        return destination;
     }
 
-    public void setTitikJemput(int titikJemput) {
-        this.titikJemput = titikJemput;
+    public void setDestination(int destination) {
+        this.destination = destination;
     }
     
+    @Override
     public String toString() {
-        return "Gosend{" + "driver=" + driver + ",Nama penerima="+ terima + ", distance=" + distance + ", titikAntar=" + titikAntar
-                + ", titikJemput=" + titikJemput + ", deliveryFee=" + '}';
+        return "Gosend{" +
+                "driver=" + driver +
+                ", receiverName='" + receiverName +
+                ", item='" + item +
+                ", distance=" + distance +
+                ", pickupLocation=" + pickupLocation +
+                ", destination=" + destination +
+                '}';
     }
 }
