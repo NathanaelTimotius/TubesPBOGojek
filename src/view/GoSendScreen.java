@@ -260,8 +260,8 @@ public class GoSendScreen{
 
                     int pickUp = Integer.parseInt(pickupField.getText());
                     int destination = Integer.parseInt(destinationField.getText());
-                    gosend.setTitikJemput(pickUp);
-                    gosend.setTitikAntar(destination);
+                    gosend.setPickupLocation(pickUp);
+                    gosend.setDestination(destination);
 
                     if (destination >= pickUp) {
                         gosend.setDistance(destination - pickUp);
