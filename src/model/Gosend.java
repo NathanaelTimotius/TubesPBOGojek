@@ -81,4 +81,8 @@ public class Gosend extends Transaction {
         this.titikJemput = titikJemput;
     }
     
+    public String toString() {
+        return "Gosend{" + "driver=" + driver + ",Nama penerima="+ terima + ", distance=" + distance + ", titikAntar=" + titikAntar
+                + ", titikJemput=" + titikJemput + ", deliveryFee=" + '}';
+    }
 }
