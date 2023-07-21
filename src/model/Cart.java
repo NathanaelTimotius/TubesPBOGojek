@@ -3,7 +3,11 @@ package model;
 public class Cart {
     private Menu menu;
     int quantity;
-
+    
+    public Cart(){
+        
+    }
+    
     public Cart(Menu menu, int quantity) {
         this.menu = menu;
         this.quantity = quantity;

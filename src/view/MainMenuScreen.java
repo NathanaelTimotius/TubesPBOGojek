@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MainMenuScreen {
 
@@ -30,6 +32,30 @@ public class MainMenuScreen {
         JButton userButton = createStyledButton("User", new Color(0, 0, 0));
         JButton driverButton = createStyledButton("Driver", new Color(0, 0, 0));
         JButton restaurantButton = createStyledButton("Restaurant", new Color(0, 0, 0));
+        adminButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new AdminScreen();
+            }
+        });
+        userButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new LoginScreen();
+            }
+        });
+        driverButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new DriverLoginScreen();
+            }
+        });
+        restaurantButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new RestoranScreen();
+            }
+        });
 
         optionsPanel.add(adminButton);
         optionsPanel.add(userButton);
@@ -37,7 +63,6 @@ public class MainMenuScreen {
         optionsPanel.add(restaurantButton);
 
         mainPanel.add(welcomePanel, BorderLayout.NORTH);
-        // mainPanel.add(loginLabel, BorderLayout.CENTER);
         mainPanel.add(optionsPanel, BorderLayout.CENTER);
 
         
