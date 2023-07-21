@@ -52,12 +52,12 @@ public class GoSendScreen{
         pesanGosend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showGoRidePage();
+                showGoSendPage();
             }
         });
     }
 
-    public void showGoRidePage() {
+    public void showGoSendPage() {
         frame = new JFrame("GoSend");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 200);
@@ -94,21 +94,23 @@ public class GoSendScreen{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = nameField.getText();
+                String name2 = nameField.getText();
                 String pickupLocation = pickupField.getText();
                 String destination = destinationField.getText();
 
                 // Panggil metode untuk memesan GoSend dengan data yang diinput pengguna
-                orderGoSend(name, pickupLocation, destination);
+                orderGoSend(name, name2, pickupLocation, destination);
             }
         });
     }
 
-    public void orderGoSend(String name, String pickupLocation, String destination) {
-        // Logika bisnis untuk memesan GoRide
+    public void orderGoSend(String name, String name2, String pickupLocation, String destination) {
+        // Logika bisnis untuk memesan GoSend
 
         // Contoh: Tampilkan pesan konfirmasi dengan informasi pemesanan
-        String confirmationMessage = "Pemesanan GoRide sukses!\n" +
-                "Nama: " + name + "\n" +
+        String confirmationMessage = "Pemesanan GoSend sukses!\n" +
+                "Nama Pengirim: " + name + "\n" +
+                "Nama Terkirim: " + name2 + "\n" +
                 "Lokasi Penjemputan: " + pickupLocation + "\n" +
                 "Tujuan: " + destination;
         JOptionPane.showMessageDialog(frame, confirmationMessage);
@@ -120,7 +122,7 @@ public class GoSendScreen{
     public static void main(String[] args) {
         // Contoh penggunaan
         User user = new User();
-        GoRideScreen goRideScreen = new GoRideScreen(user);
-        goRideScreen.showMainPage();
+        GoSendScreen goSendScreen = new GoSendScreen(user);
+        goSendScreen.showMainPage();
     }
 }
