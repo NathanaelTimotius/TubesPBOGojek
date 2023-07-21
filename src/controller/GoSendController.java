@@ -132,12 +132,14 @@ public class GoSendController {
     public boolean insertToGoSend(Gosend gosend){
         try {
             conn.connect();
-            String query = "INSERT INTO gosend(id_transaksi, id_region_antar, id_region_jemput, distance) VALUES(?,?,?,?)";
+            String query = "INSERT INTO gosend(id_transaksi, id_region_ambil, id_region_antar, nama_penerima, nama_item, distance) VALUES(?,?,?,?)";
             PreparedStatement stmt = conn.con.prepareStatement(query);
             stmt.setInt(1, gosend.getTransactionID());
-            stmt.setInt(2, gosend.getTitikAntar());
-            stmt.setInt(3, gosend.getTitikJemput());
-            stmt.setDouble(4, gosend.getDistance());
+            stmt.setInt(2, gosend.getPickupLocation());
+            stmt.setInt(3, gosend.getDestination());
+            stmt.setString(4, gosend.getReceiverName());
+            stmt.setString(5, gosend.getItem());
+            stmt.setDouble(6, gosend.getDistance());
 
             stmt.executeUpdate();
             return true;
