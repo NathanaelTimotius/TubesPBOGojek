@@ -237,7 +237,7 @@ public class GoRideScreen {
                     goride.setTitikJemput(pickUp);
                     goride.setTitikAntar(destination);
 
-                    if (pickUp >= destination) {
+                    if (destination >= pickUp) {
                         goride.setDistance(destination - pickUp);
                     } else {
                         goride.setDistance(pickUp - destination);

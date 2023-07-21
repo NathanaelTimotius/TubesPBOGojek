@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import controller.Controller;
+import java.util.ArrayList;
+import model.*;
 
 public class LoginScreen {
 
@@ -39,6 +42,25 @@ public class LoginScreen {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = String.valueOf(passwordField.getPassword());
+
+                ArrayList<User> users = Controller.getInstance().getAllUsers();
+
+
+                for (User u : users)
+                {
+                    System.out.println(u.getUsername());
+                    System.out.println(u.getPassword());
+                    if (u.getUsername().equals(username) && u.getPassword().equals(password))
+                    {
+                        Controller.getInstance().currentUser = u;
+                        JOptionPane.showMessageDialog(frame, "Login Success as " + u.getName());
+                        new UserScreen();
+                        frame.setVisible(false);
+                        return;
+                    }
+                }
+
+                JOptionPane.showMessageDialog(frame, "Login failed!");
 
             }
         });

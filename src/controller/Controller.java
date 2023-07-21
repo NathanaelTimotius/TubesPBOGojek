@@ -7,13 +7,25 @@ import java.util.ArrayList;
 import model.*;
 
 public class Controller {
+    private static Controller single_instance = null;
+
+    public static synchronized Controller getInstance()
+    {
+        if (single_instance == null)
+            single_instance = new Controller();
+  
+        return single_instance;
+    }
+
+    public User currentUser = null;
+    
     DatabaseHandler conn = new DatabaseHandler();
     
     // SELECT ALL 
     public  ArrayList<User> getAllUsers() {
         ArrayList<User> users = new ArrayList<>();
         conn.connect();
-        String query = "SELECT * FROM user";
+        String query = "SELECT * FROM users";
         try {
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
