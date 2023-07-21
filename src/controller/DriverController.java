@@ -3,11 +3,15 @@ package controller;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import model.Cart;
 
 import model.Driver;
+import model.Gofood;
 import model.Goride;
 import model.OrderStatus;
 import model.PaymentMethod;
+import model.Region;
 import model.Transaction;
 import model.Vehicle;
 import model.VehicleType;
@@ -124,7 +128,49 @@ public class DriverController {
         }
         return goride;
     }
-
+    
+    public Gofood getPendingGoFood(int transactionID) {
+       Gofood gofood = null;
+        try {
+            conn.connect();
+            String query = "SELECT * FROM gofood WHERE id_transaksi = " + transactionID;
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                gofood = new Gofood();
+                gofood.setTransactionID(rs.getInt("id_transaksi"));
+                gofood.setRestaurantName(rs.getString("restoran_name"));
+                gofood.setCart(getAllCartPerGroup(rs.getInt("id_cart")));
+                gofood.setTitikAntar(rs.getInt("id_region_antar"));
+                gofood.setDistance(rs.getDouble("distance"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+        return gofood;
+    }
+    
+    public ArrayList<Cart> getAllCartPerGroup(int cartGroup){
+        conn.connect();
+        String query = "SELECT * FROM cart WHERE cart_group = '" + cartGroup + "'";
+        ArrayList<Cart> carts = new ArrayList<>();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Cart cart = new Cart();
+                cart.setQuantity(rs.getInt("quantity"));
+                cart.setMenu(new Controller().getMenu(rs.getInt("id_menu")));
+                carts.add(cart);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (carts);
+    }
+    
     public Voucher getVoucher(int id){
         Voucher voucher = null;
         try {
@@ -199,5 +245,47 @@ public class DriverController {
         } finally {
             conn.disconnect();
         }
+    }
+    
+    public boolean setDriverGofood(Gofood gofood, Driver driver){
+        try {
+            conn.connect();
+            String query = "UPDATE gofood SET id_driver=" + driver.getDriverID() + " WHERE id_gofood=" + gofood.getTransactionID();
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public String getRegionName(int regionPosition){
+        String region = "Not Found";
+        try {
+            conn.connect();
+            String query = "SELECT * FROM region WHERE regionPosition = " + regionPosition;
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                region = rs.getString("regionName");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+        return region;
+    }
+    
+    public String printAllCart(ArrayList<Cart> listCart){
+        String text = "";
+        for (Cart cart : listCart) {
+            text += cart.getMenu().getMenuName() + ": ";
+            text += cart.getQuantity()+ "  \n";
+        }
+        return text;
     }
 }

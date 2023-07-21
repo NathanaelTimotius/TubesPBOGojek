@@ -1,10 +1,12 @@
 package controller;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import model.*;
+
 
 public class Controller {
     private static Controller single_instance = null;
@@ -18,11 +20,11 @@ public class Controller {
     }
 
     public User currentUser = null;
+    public Driver currentDriver = null;
     
     DatabaseHandler conn = new DatabaseHandler();
     
-    // SELECT ALL 
-    public  ArrayList<User> getAllUsers() {
+    public ArrayList<User> getAllUsers() {
         ArrayList<User> users = new ArrayList<>();
         conn.connect();
         String query = "SELECT * FROM users";
@@ -53,8 +55,54 @@ public class Controller {
         return (users);
     }
     
-    // SELECT ALL Transaction pada user tertentu
-    public  ArrayList<Transaction> getAllTransactionPerUser(int Id_User) {
+    public ArrayList<Driver> getAllDrivers() {
+        ArrayList<Driver> drivers = new ArrayList<>();
+        conn.connect();
+        String query = "SELECT * FROM driver";
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Driver driver = new Driver();
+                driver.setVehicle(getKendaraanDriver(rs.getInt("id_kendaraan")));
+                driver.setName(rs.getString("name"));
+                driver.setPhoneNumber(rs.getString("phoneNumber"));
+                driver.setBirthDate(rs.getDate("birthDate"));
+                driver.setNIK(rs.getString("NIK"));
+                driver.setPassword(rs.getString("password"));
+                driver.setIncome(rs.getDouble("income"));
+                driver.setAvailable(rs.getBoolean("available"));
+                drivers.add(driver);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (drivers);
+    }
+    
+    public Vehicle getKendaraanDriver(int idKendaraan){
+        conn.connect();
+        String query = "SELECT * FROM kendaraan WHERE id_kendaraan='" + idKendaraan + "'";
+        Vehicle kendaraan = new Vehicle();
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                if (rs.getString("jenisKendaraan").equals(VehicleType.MOTOR.toString())){
+                    kendaraan.setVehicleType(VehicleType.MOTOR);
+                } else {
+                    kendaraan.setVehicleType(VehicleType.MOBIL);
+                }
+                kendaraan.setModel(rs.getString("modelKendaraan"));
+                kendaraan.setNumberPlate(rs.getString("numberPlate"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (kendaraan);
+    }
+    
+    public ArrayList<Transaction> getAllTransactionPerUser(int Id_User) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         conn.connect();
         String query = "SELECT * FROM transaksi WHERE id_user='" + Id_User + "'";
@@ -239,7 +287,7 @@ public class Controller {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 menu.setMenuName(rs.getString("menuName"));
-                if (rs.getString("menuType").equals(MenuType.FOOD)){
+                if (rs.getString("menuType").equals(MenuType.FOOD.toString())){
                     menu.setMenuType(MenuType.FOOD);
                 } else {
                     menu.setMenuType(MenuType.DRINK);
@@ -269,11 +317,143 @@ public class Controller {
         return (region);
     }
     
-//    public Service getServiceID(int serviceID){
-//        if (serviceID == Service.GOCAR){
-//            Service service = new GocarService();
-//        }
-//    }
+    public boolean insertToCart(ArrayList<Cart> listCart){
+        int cartGroup = getLastCartGroup() + 1;
+        try {
+            conn.connect();
+            String query = "INSERT INTO cart(cart_group, id_menu, quantity) VALUES(?,?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            for (Cart cart : listCart) {
+                stmt.setInt(1, cartGroup);
+                stmt.setInt(2, getMenuId(cart.getMenu()));
+                stmt.setInt(3, cart.getQuantity());
+                stmt.executeUpdate();
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean insertToGoFood(Gofood gofood){
+        try {
+            conn.connect();
+            String query = "INSERT INTO gofood(id_transaksi, id_restoran, id_cart, distance, restoran_name, delivery_fee, id_region_antar) VALUES(?,?,?,?,?,?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setInt(1, gofood.getTransactionID());
+            stmt.setInt(2, gofood.getRestaurantID());
+            stmt.setInt(3, getLastCartGroup());
+            stmt.setDouble(4, gofood.getDistance());
+            stmt.setString(5, gofood.getRestaurantName());
+            stmt.setDouble(6, gofood.getDeliveryFee());
+            stmt.setInt(7, gofood.getTitikAntar());
+            
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean insertToGoPay(Gopay gopay){
+        try {
+            conn.connect();
+            String query = "INSERT INTO gopay(top_up_balance, id_transaksi) VALUES(?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setDouble(1, gopay.getTopUpBalance());
+            stmt.setInt(2, gopay.getTransactionID());
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean updateUserTotalBalance(double topUp, User user){
+        try {
+            conn.connect();
+            String query = "UPDATE users SET totalBalance = totalBalance + " + topUp + " WHERE id_user =" + user.getUserID();
+
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean updateIncomeRestoran(int idRestoran, double incomeRestoran){
+        try {
+            conn.connect();
+            String query = "UPDATE restoran SET income = income + " + incomeRestoran + " WHERE id_restoran =" + idRestoran;
+
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public int getMenuId(Menu menu) {
+        try {
+            conn.connect();
+            String query = "SELECT id_menu FROM menu WHERE menuName = ? AND menuType= ? AND price = ?";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setString(1, menu.getMenuName());
+            if (menu.getMenuType().equals(MenuType.FOOD)){
+                stmt.setString(2, "FOOD");
+            } else {
+                stmt.setString(2, "DRINK");
+            }
+            stmt.setDouble(3, menu.getPrice());
+
+            ResultSet rs = stmt.executeQuery();
+            
+             if (rs.next()) {
+                return rs.getInt("id_menu");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public int getLastCartGroup() {
+        try {
+            conn.connect();
+            String query = "SELECT * FROM cart ORDER BY id_cart DESC LIMIT 1;";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("cart_group");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            conn.disconnect();
+        }
+    }
 
     public int getBiayaOngkir(int tempRegion, int idRegionRestoran){
         int biayaOngkir = 5000;
@@ -289,13 +469,13 @@ public class Controller {
         int biayaMenu = 0;
         
         for (Cart cart : listCart) {
-            biayaMenu = cart.getMenu().getPrice() * cart.getQuantity();
+            biayaMenu += cart.getMenu().getPrice() * cart.getQuantity();
         }
         
         return biayaMenu;
     }
     
-    public double getTotalBiaya(int biayaOngkir, int biayaMenu, String voucherName){
+    public double getTotalBiaya(double biayaOngkir, int biayaMenu, String voucherName){
         double totalBiaya = biayaOngkir + biayaMenu;
         if (voucherName.equals("")){
             return totalBiaya;

@@ -36,19 +36,29 @@ public class GoRideScreen {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 200);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 1, 10, 10));
+        panel.setLayout(new GridLayout(4, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         nameLabel = new JLabel("Nama: " + currentUser.getName());
         balanceLabel = new JLabel("Saldo GoPay: " + currentUser.getTotalBalance());
         JButton goRideButton = new JButton("Pesan GoRide");
 
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new UserScreen();
+            }
+        });
+        
         panel.add(nameLabel);
         panel.add(balanceLabel);
         panel.add(goRideButton);
-
+        panel.add(backButton);
+        
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
 
@@ -66,6 +76,7 @@ public class GoRideScreen {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(350, 600);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -258,12 +269,5 @@ public class GoRideScreen {
         } else {
             JOptionPane.showMessageDialog(frame, "Cancel pemesanan");
         }
-    }
-
-    public static void main(String[] args) {
-        // Contoh penggunaan
-        User user = new GoRideController().getUserByUsername("user1");
-        GoRideScreen goRideScreen = new GoRideScreen(user);
-        goRideScreen.showMainPage();
     }
 }

@@ -10,8 +10,12 @@ public class Gocar extends Transaction {
     private double deliveryFee;
     private CarType carType;
 
-    public Gocar(Driver driver, double distance, Region titikAntar, Region titikJemput, double deliveryFee, CarType carType, String personName, Service serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee) {
-        super(personName, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee);
+    public Gocar (){
+        
+    }
+
+    public Gocar(Driver driver, double distance, Region titikAntar, Region titikJemput, double deliveryFee, CarType carType, int userID, int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee, OrderStatus orderStatus) {
+        super(userID, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee, orderStatus);
         this.driver = driver;
         this.distance = distance;
         this.titikAntar = titikAntar;
@@ -19,8 +23,6 @@ public class Gocar extends Transaction {
         this.deliveryFee = deliveryFee;
         this.carType = carType;
     }
-
-
 
     public Driver getDriver() {
         return driver;

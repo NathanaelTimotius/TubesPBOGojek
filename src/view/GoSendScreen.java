@@ -285,11 +285,4 @@ public class GoSendScreen{
             JOptionPane.showMessageDialog(frame, "Cancel pemesanan");
         }
     }
-
-    public static void main(String[] args) {
-        // Contoh penggunaan
-        User user = new GoSendController().getUserByUsername("user1");
-        GoSendScreen goSendScreen = new GoSendScreen(user);
-        goSendScreen.showMainPage();
-    }
 }

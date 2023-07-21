@@ -8,12 +8,12 @@ import controller.Controller;
 import java.util.ArrayList;
 import model.*;
 
-public class LoginScreen {
+public class DriverLoginScreen {
 
-    private JTextField usernameField;
+    private JTextField nikField;
     private JPasswordField passwordField;
 
-    public LoginScreen() {
+    public DriverLoginScreen() {
         JFrame frame = new JFrame();
         frame.setTitle("Login");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,16 +23,16 @@ public class LoginScreen {
         JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameField = new JTextField();
+        JLabel nikLabel = new JLabel("NIK:");
+        nikField = new JTextField();
 
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
 
         JButton loginButton = new JButton("Login");
 
-        mainPanel.add(usernameLabel);
-        mainPanel.add(usernameField);
+        mainPanel.add(nikLabel);
+        mainPanel.add(nikField);
         mainPanel.add(passwordLabel);
         mainPanel.add(passwordField);
         mainPanel.add(loginButton);
@@ -40,20 +40,19 @@ public class LoginScreen {
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
+                String nik = nikField.getText();
                 String password = String.valueOf(passwordField.getPassword());
 
-                ArrayList<User> users = Controller.getInstance().getAllUsers();
-
-
-                for (User u : users)
+                ArrayList<Driver> drivers = Controller.getInstance().getAllDrivers();
+                for (Driver d : drivers)
                 {
-                    if (u.getUsername().equals(username) && u.getPassword().equals(password))
+                    if (d.getNIK().equals(nik) && d.getPassword().equals(password))
                     {
-                        Controller.getInstance().currentUser = u;
-                        JOptionPane.showMessageDialog(frame, "Login Success as " + u.getName());
-                        new UserScreen();
+                        Controller.getInstance().currentDriver = d;
+                        JOptionPane.showMessageDialog(frame, "Login Success as " + d.getName());
                         frame.setVisible(false);
+                        DriverScreen driverScreen = new DriverScreen(Controller.getInstance().currentDriver);
+                        driverScreen.showMainPage();
                         return;
                     }
                 }
