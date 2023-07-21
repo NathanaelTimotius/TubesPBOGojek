@@ -97,13 +97,13 @@ public class GoSendScreen{
                 String pickupLocation = pickupField.getText();
                 String destination = destinationField.getText();
 
-                // Panggil metode untuk memesan GoRide dengan data yang diinput pengguna
-                orderGoRide(name, pickupLocation, destination);
+                // Panggil metode untuk memesan GoSend dengan data yang diinput pengguna
+                orderGoSend(name, pickupLocation, destination);
             }
         });
     }
 
-    public void orderGoRide(String name, String pickupLocation, String destination) {
+    public void orderGoSend(String name, String pickupLocation, String destination) {
         // Logika bisnis untuk memesan GoRide
 
         // Contoh: Tampilkan pesan konfirmasi dengan informasi pemesanan
