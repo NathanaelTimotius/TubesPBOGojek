@@ -26,6 +26,8 @@ public class GoSendScreen{
     private ArrayList<Region> regions;
     private JTextField pickupField;
     private JTextField destinationField;
+    private JTextField receiverNameField;
+    private JTextField itemNameField;
 
     public GoSendScreen(User user) {
         currentUser = user;
@@ -121,7 +123,25 @@ public class GoSendScreen{
         gb.gridx = 1;
         destinationField = new JTextField();
         panel.add(destinationField, gb);
+        
+        countY++;
+        gb.gridx = 0;
+        gb.gridy = countY;
+        JLabel receiverNameLabel = new JLabel("Nama Penerima:");
+        panel.add(receiverNameLabel, gb);
+        gb.gridx = 1;
+        JTextField receiverNameField = new JTextField();
+        panel.add(receiverNameField, gb);
 
+        countY++;
+        gb.gridx = 0;
+        gb.gridy = countY;
+        JLabel itemNameLabel = new JLabel("Nama Item:");
+        panel.add(itemNameLabel, gb);
+        gb.gridx = 1;
+        JTextField itemNameField = new JTextField();
+        panel.add(itemNameField, gb);
+        
         countY++;
         gb.gridx = 0;
         gb.gridy = countY;
@@ -206,10 +226,16 @@ public class GoSendScreen{
     }
 
     public void orderGoRide(Transaction transaction) {
-        // Logika bisnis untuk memesan GoRide
-        String confirmationMessage = "Pemesanan GoRide sukses!\n"
+        // Logika bisnis untuk memesan GoSend
+        
+        String receiverName = receiverNameField.getText(); // Mendapatkan nama penerima dari input
+        String itemName = itemNameField.getText(); // Mendapatkan nama item dari input
+        
+        String confirmationMessage = "Pemesanan GoSend sukses!\n"
                 + "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName()
                 + "\nTujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName()
+                + "\nNama Penerima: " +receiverName
+                + "\nNama Item: " +itemName
                 + "\nTotal Pembayaran: " + transaction.getPriceAfterDiscount()
                 + "\nMetode Pembayaran: " + transaction.getPaymentMethod().name();
         int confirm = JOptionPane.showConfirmDialog(frame, confirmationMessage, "Confirmation",
@@ -227,7 +253,7 @@ public class GoSendScreen{
                 }
             }
             if (lanjut) {
-                boolean berhasil = new GoSendController().insertGoRideTransaction(transaction);
+                boolean berhasil = new GoSendController().insertGoSendTransaction(transaction);
                 if (berhasil) {
                     Gosend gosend = new Gosend();
                     gosend.setTransactionID(new GoSendController().getTransactionID(transaction));
@@ -243,7 +269,7 @@ public class GoSendScreen{
                         gosend.setDistance(pickUp - destination);
                     }
 
-                    boolean berhasil2 = new GoSendController().insertToGoRide(gosend);
+                    boolean berhasil2 = new GoSendController().insertToGoSend(gosend);
                     if (berhasil2){
                         JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
                     } else {
