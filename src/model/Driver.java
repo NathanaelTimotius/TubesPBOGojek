@@ -8,21 +8,22 @@ public class Driver extends Person {
     private int driverID;
     private double income;
     private Vehicle vehicle;
-    
-    public Driver(){
-        
+    private boolean available;
+
+    public Driver() {
+
     }
-    
-    public Driver(String NIK, String password, int driverID, double income, Vehicle vehicle, String name, String address, String phoneNumber, Date birthDate) {
+
+    public Driver(String NIK, String password, int driverID, double income, Vehicle vehicle, String name,
+            String address, String phoneNumber, Date birthDate, boolean available) {
         super(name, address, phoneNumber, birthDate);
         this.NIK = NIK;
         this.password = password;
         this.driverID = driverID;
         this.income = income;
         this.vehicle = vehicle;
+        this.available = available;
     }
-
-    
 
     public String getNIK() {
         return NIK;
@@ -64,8 +65,17 @@ public class Driver extends Person {
         this.vehicle = vehicle;
     }
 
+    public boolean getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
     @Override
     public String toString() {
-        return "Driver{" + "NIK=" + NIK + ", password=" + password + ", driverID=" + driverID + ", income=" + income + ", vehicle=" + vehicle + '}';
+        return "Driver{" + "NIK=" + NIK + ", password=" + password + ", driverID=" + driverID + ", income=" + income
+                + ", vehicle=" + vehicle + '}';
     }
 }

@@ -3,6 +3,7 @@ package view;
 import javax.swing.*;
 
 import controller.GoRideController;
+import model.Goride;
 import model.OrderStatus;
 import model.User;
 import model.PaymentMethod;
@@ -84,7 +85,7 @@ public class GoRideScreen {
         gb.anchor = GridBagConstraints.WEST;
         int countY = 1;
         regions = new GoRideController().getAllRegions();
-        for(Region region : regions){
+        for (Region region : regions) {
             gb.gridx = 0;
             gb.gridy = countY;
             gb.anchor = GridBagConstraints.WEST;
@@ -164,66 +165,99 @@ public class GoRideScreen {
             public void actionPerformed(ActionEvent e) {
                 int pickupLocation = Integer.parseInt(pickupField.getText());
                 int destination = Integer.parseInt(destinationField.getText());
-                PaymentMethod paymentMethod = PaymentMethod.valueOf((String)paymentButtonGroup.getSelection().getActionCommand());
-                Voucher voucher;
-                if (voucherField.getText().isEmpty()){
-                    voucher = null;
-                } else {
-                    voucher = new Voucher();
-                    voucher.setVoucherName(voucherField.getText());
-                }
+                PaymentMethod paymentMethod = PaymentMethod
+                        .valueOf((String) paymentButtonGroup.getSelection().getActionCommand());
 
                 double totalPrice = 0;
-                if(destination > pickupLocation) {
+                if (destination > pickupLocation) {
                     totalPrice = 5000 + (7000 * (destination - pickupLocation));
                 } else {
                     totalPrice = 5000 + (7000 * (pickupLocation - destination));
                 }
-                
+
+                Voucher voucher;
                 double totalDiscount = 0;
+                boolean isValid = true;
+                if (voucherField.getText().isEmpty()) {
+                    voucher = null;
+                } else {
+                    voucher = new GoRideController().getVoucher(voucherField.getText());
+                    if (voucher != null) {
+                        totalDiscount = totalPrice * voucher.getDiscountPercentage() / 100;
+                    } else {
+                        isValid = false;
+                        JOptionPane.showMessageDialog(frame, "Voucher tidak ada");
+                    }
+                }
+
                 double priceAfterDiscount = totalPrice - totalDiscount;
                 Date now = new Date();
 
                 double adminFee = 2000;
 
-                Transaction transaction = new Transaction(currentUser.getUserID(), Service.GORIDE, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, now, 0, adminFee, OrderStatus.PENDING);
+                Transaction transaction = new Transaction(currentUser.getUserID(), Service.GORIDE, paymentMethod,
+                        voucher, totalPrice, totalDiscount, priceAfterDiscount, now, 0, adminFee, OrderStatus.PENDING);
 
-                orderGoRide(transaction);
+                if (isValid) {
+                    orderGoRide(transaction);
+                }
             }
         });
     }
 
     public void orderGoRide(Transaction transaction) {
         // Logika bisnis untuk memesan GoRide
-        String confirmationMessage = "Pemesanan GoRide sukses!\n" +
-                "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName() + "\n" +
-                "Tujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName() + "\n" +
-                "Total Pembayaran: " + transaction.getPriceAfterDiscount() + "\n" +
-                "Metode Pembayaran: " + transaction.getPaymentMethod().name();
-        int confirm = JOptionPane.showConfirmDialog(frame, confirmationMessage, "Confirmation", JOptionPane.YES_NO_OPTION);
+        String confirmationMessage = "Pemesanan GoRide sukses!\n"
+                + "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName()
+                + "\nTujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName()
+                + "\nTotal Pembayaran: " + transaction.getPriceAfterDiscount()
+                + "\nMetode Pembayaran: " + transaction.getPaymentMethod().name();
+        int confirm = JOptionPane.showConfirmDialog(frame, confirmationMessage, "Confirmation",
+                JOptionPane.YES_NO_OPTION);
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean berhasil = new GoRideController().insertGoRideTransaction(transaction);
-            if (berhasil) {
-                if (transaction.getPaymentMethod() == PaymentMethod.GOPAY){
-                    if (currentUser.getTotalBalance() >= transaction.getPriceAfterDiscount()){
-                        currentUser.setTotalBalance(currentUser.getTotalBalance() - transaction.getPriceAfterDiscount());
-                        new GoRideController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
-                        JOptionPane.showMessageDialog(frame, "Pembayaran berhasil \nSisa GOPAY: " + currentUser.getTotalBalance());
+        boolean lanjut = true;
+        if (confirm == JOptionPane.YES_OPTION) { // CONFIRM
+            if (transaction.getPaymentMethod() == PaymentMethod.GOPAY) { // GOPAY ??
+                if (currentUser.getTotalBalance() >= transaction.getPriceAfterDiscount()) { // CEK SALDO
+                    currentUser.setTotalBalance(currentUser.getTotalBalance() - transaction.getPriceAfterDiscount());
+                    new GoRideController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Saldo GOPAY tidak cukup");
+                    lanjut = false; // GA BISA LANJUT
+                }
+            }
+            if (lanjut) {
+                boolean berhasil = new GoRideController().insertGoRideTransaction(transaction);
+                if (berhasil) {
+                    Goride goride = new Goride();
+                    goride.setTransactionID(new GoRideController().getTransactionID(transaction));
+
+                    int pickUp = Integer.parseInt(pickupField.getText());
+                    int destination = Integer.parseInt(destinationField.getText());
+                    goride.setTitikJemput(pickUp);
+                    goride.setTitikAntar(destination);
+
+                    if (pickUp >= destination) {
+                        goride.setDistance(destination - pickUp);
                     } else {
-                        JOptionPane.showMessageDialog(frame, "Saldo GOPAY tidak cukup");
+                        goride.setDistance(pickUp - destination);
+                    }
+
+                    boolean berhasil2 = new GoRideController().insertToGoRide(goride);
+                    if (berhasil2){
+                        JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
                     }
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
+                    JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
                 }
-            } else {
-                JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
             }
             frame.dispose();
             showMainPage();
         } else {
             JOptionPane.showMessageDialog(frame, "Cancel pemesanan");
-        }       
+        }
     }
 
     public static void main(String[] args) {

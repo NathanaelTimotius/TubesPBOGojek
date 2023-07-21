@@ -5,6 +5,10 @@ public class Vehicle {
     private String model;
     private String numberPlate;
 
+    public Vehicle() {
+
+    }
+
     public Vehicle(VehicleType vehicleType, String model, String numberPlate) {
         this.vehicleType = vehicleType;
         this.model = model;
