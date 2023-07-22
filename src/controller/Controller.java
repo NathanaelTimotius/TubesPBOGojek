@@ -21,8 +21,33 @@ public class Controller {
 
     public User currentUser = null;
     public Driver currentDriver = null;
+    public Restaurant currentRestoran = null;
+    public Admin currentAdmin = null;
     
     DatabaseHandler conn = new DatabaseHandler();
+    
+    public ArrayList<Admin> getAllAdmin(){
+        ArrayList<Admin> admins = new ArrayList<>();
+        conn.connect();
+        String query = "SELECT * FROM admin";
+        try {
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Admin admin = new Admin();
+                admin.setName(rs.getString("Name"));
+                admin.setPhoneNumber(rs.getString("phoneNumber"));
+                admin.setBirthDate(rs.getDate("birthDate"));
+                admin.setUsername(rs.getString("username"));
+                admin.setPassword(rs.getString("password"));
+                admin.setIncome(rs.getDouble("income"));
+                admins.add(admin);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return (admins);
+    }
     
     public ArrayList<User> getAllUsers() {
         ArrayList<User> users = new ArrayList<>();
@@ -249,6 +274,7 @@ public class Controller {
                 resto.setRegion(getRegion(rs.getInt("id_region")));
                 resto.setListMenu(getMenuRestoran(rs.getInt("id_restoran")));
                 resto.setIncome(rs.getDouble("income"));
+                resto.setUsername(rs.getString("username"));
                 restaurants.add(resto);
             }
         } catch (SQLException e) {
@@ -378,6 +404,71 @@ public class Controller {
         }
     }
     
+    public boolean insertToMenu(Menu menu){
+        try {
+            conn.connect();
+            String query = "INSERT INTO menu(menuName, menuType, price) VALUES(?,?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setString(1, menu.getMenuName());
+            if (menu.getMenuType().equals(MenuType.FOOD)){
+                stmt.setString(2, "FOOD");
+            } else {
+                stmt.setString(2, "DRINK");
+            }
+            stmt.setInt(3, menu.getPrice());
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean insertToRestoranMenu(Restaurant restoran, Menu menu){
+         try {
+            conn.connect();
+            String query = "INSERT INTO restoran_menu(id_restoran, id_menu) VALUES(?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setInt(1, restoran.getRestaurantID());
+            stmt.setInt(2, getMenuId(menu));
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean insertToUser(User user){
+         try {
+            conn.connect();
+            String query = "INSERT INTO users(id_region, name, address, phoneNumber, birthDate, username, email, password, gender, totalBalance) VALUES(?,?,?,?,?,?,?,?,?,?)";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setInt(1, getRegionId(user.getRegion()));
+            stmt.setString(2, user.getName());
+            stmt.setString(3, user.getAddress());
+            stmt.setString(4, user.getPhoneNumber());
+            stmt.setDate(5, user.getBirthDate());
+            stmt.setString(6, user.getUsername());
+            stmt.setString(7, user.getEmail());
+            stmt.setString(8, user.getPassword());
+            stmt.setString(9, user.getGender());
+            stmt.setDouble(10, user.getTotalBalance());
+            
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
     public boolean updateUserTotalBalance(double topUp, User user){
         try {
             conn.connect();
@@ -427,6 +518,27 @@ public class Controller {
             
              if (rs.next()) {
                 return rs.getInt("id_menu");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public int getRegionId(Region region){
+        try {
+            conn.connect();
+            String query = "SELECT id_region FROM region WHERE regionName = ? AND regionPosition = ?";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            stmt.setString(1, region.getRegionName());
+            stmt.setInt(2, region.getRegionPosition());
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("id_region");
             }
             return 0;
         } catch (SQLException e) {

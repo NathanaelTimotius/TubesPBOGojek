@@ -10,12 +10,13 @@ public class Restaurant {
     private Region region;
     private ArrayList<Menu> listMenu;
     private double income;
-
+    private String username;
+    
     public Restaurant (){
         
     }
-    
-    public Restaurant(int restaurantID, String restaurantName, String password, String phoneNumber, Region region, ArrayList<Menu> listMenu, double income) {
+
+    public Restaurant(int restaurantID, String restaurantName, String password, String phoneNumber, Region region, ArrayList<Menu> listMenu, double income, String username) {
         this.restaurantID = restaurantID;
         this.restaurantName = restaurantName;
         this.password = password;
@@ -23,7 +24,18 @@ public class Restaurant {
         this.region = region;
         this.listMenu = listMenu;
         this.income = income;
+        this.username = username;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    
 
     public int getRestaurantID() {
         return restaurantID;

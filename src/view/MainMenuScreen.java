@@ -35,7 +35,7 @@ public class MainMenuScreen {
         adminButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                new AdminScreen();
+                new AdminLoginScreen();
             }
         });
         userButton.addActionListener(new ActionListener() {
@@ -53,7 +53,7 @@ public class MainMenuScreen {
         restaurantButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                new RestoranScreen();
+                new RestoranLoginScreen();
             }
         });
 

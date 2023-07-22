@@ -4,14 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.sql.Date;
 
 import com.toedter.calendar.JDateChooser;
+import controller.Controller;
+import model.User;
 
 public class RegisterScreen extends JFrame {
     private JTextField nameField;
@@ -24,13 +21,16 @@ public class RegisterScreen extends JFrame {
     private JRadioButton femaleRadioButton;
     private JDateChooser birthdayDatePicker;
     private JTextField idRegionField;
-
+    private JFrame frame; 
+    
     public RegisterScreen() {
         setTitle("Registrasi");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(500, 400);
         setLocationRelativeTo(null);
-
+        
+        frame = this;
+        
         initUI();
     }
 
@@ -78,6 +78,16 @@ public class RegisterScreen extends JFrame {
         // Photo FileChooser
         JLabel idRegion = new JLabel("Region:");
         idRegionField = new JTextField(20);
+        
+        JPanel backPanel = new JPanel();
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new MainMenuScreen();
+            }
+        });
+        backPanel.add(backButton);
 
         // Register Button
         JButton registerButton = new JButton("Registrasi");
@@ -90,9 +100,10 @@ public class RegisterScreen extends JFrame {
                 String username = usernameField.getText();
                 String email = emailField.getText();
                 char[] password = passwordField.getPassword();
+                String passwordString = new String(password);
                 String passwordStr = new String(password);
-                String gender = maleRadioButton.isSelected() ? "Laki-laki" : "Perempuan";
-                Date birthday = birthdayDatePicker.getDate();
+                String gender = maleRadioButton.isSelected() ? "Male" : "Female";
+                Date birthday = new java.sql.Date(birthdayDatePicker.getDate().getTime());
                 int idRegion = Integer.parseInt(idRegionField.getText());
 
                 if (passwordStr.length() < 8) {
@@ -100,12 +111,29 @@ public class RegisterScreen extends JFrame {
                             "Password harus terdiri dari minimal 8 karakter.",
                             "Registrasi Gagal", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    saveUserDataToDatabase(name, address, phoneNumber, username, email, passwordStr, gender, birthday,
-                            idRegion);
-
-                    JOptionPane.showMessageDialog(RegisterScreen.this,
+                    User user = new User();
+                    user.setRegion(new Controller().getRegion(idRegion));
+                    user.setName(name);
+                    user.setAddress(address);
+                    user.setPhoneNumber(phoneNumber);
+                    user.setBirthDate(birthday);
+                    user.setUsername(username);
+                    user.setEmail(email);
+                    user.setPassword(passwordString);
+                    user.setGender(gender);
+                    user.setTotalBalance(0);
+                    
+                    boolean berhasil = new Controller().insertToUser(user);
+                    if (berhasil){
+                        frame.dispose();
+                        JOptionPane.showMessageDialog(RegisterScreen.this,
                             "Registrasi berhasil. Data berhasil disimpan.",
                             "Registrasi Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Registration Error", "Error", JOptionPane.ERROR_MESSAGE);
+
+                    }
+                    
                 }
             }
         });
@@ -178,7 +206,8 @@ public class RegisterScreen extends JFrame {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(registerButton);
-
+        buttonPanel.add(backPanel);
+        
         gbc.gridx = 0;
         gbc.gridy = 9;
         gbc.gridwidth = 3;
@@ -188,45 +217,5 @@ public class RegisterScreen extends JFrame {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.setPreferredSize(new Dimension(480, 250));
         add(scrollPane);
-    }
-
-    private void saveUserDataToDatabase(String name, String address, String phoneNumber, String username, String email,
-            String password,
-            String gender, Date birthday, int idRegion) {
-        // Database connection variables
-        String databaseURL = "jdbc:mysql://localhost:3306/gojek";
-        String dbUsername = "root";
-        String dbPassword = "";
-
-        // SQL query to insert user data into the "users" table
-        String insertQuery = "INSERT INTO users (name, address, phoneNumber, username, email, password, gender, birthDate, id_region, totalBalance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
-
-        try (Connection connection = DriverManager.getConnection(databaseURL, dbUsername, dbPassword);
-                PreparedStatement statement = connection.prepareStatement(insertQuery)) {
-
-            // Set values for the prepared statement
-            statement.setString(1, name);
-            statement.setString(2, address);
-            statement.setString(3, phoneNumber);
-            statement.setString(4, username);
-            statement.setString(5, email);
-            statement.setString(6, password);
-            statement.setString(7, gender);
-
-            // Format the birthdate in the format expected by the database (YYYY-MM-DD)
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String formattedBirthdate = sdf.format(birthday);
-            statement.setString(8, formattedBirthdate);
-
-            statement.setInt(9, idRegion);
-
-            // ... (Existing code for the rest of the prepared statement values)
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(RegisterScreen.this,
-                    "Terjadi kesalahan saat menyimpan data.",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
     }
 }
