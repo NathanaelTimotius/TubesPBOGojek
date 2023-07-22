@@ -8,12 +8,12 @@ import controller.Controller;
 import java.util.ArrayList;
 import model.*;
 
-public class LoginScreen {
+public class RestoranLoginScreen {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
 
-    public LoginScreen() {
+    public RestoranLoginScreen() {
         JFrame frame = new JFrame();
         frame.setTitle("Login");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,30 +23,28 @@ public class LoginScreen {
         JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel usernameLabel = new JLabel("Username:");
+        JLabel nikLabel = new JLabel("Username:");
         usernameField = new JTextField();
 
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
 
         JButton loginButton = new JButton("Login");
-        JButton registerButton = new JButton("Register");
-
-        mainPanel.add(usernameLabel);
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new MainMenuScreen();
+            }
+        });
+        
+        
+        mainPanel.add(nikLabel);
         mainPanel.add(usernameField);
         mainPanel.add(passwordLabel);
         mainPanel.add(passwordField);
         mainPanel.add(loginButton);
-        mainPanel.add(registerButton);
-        
-        registerButton.addActionListener(new ActionListener(){
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                RegisterScreen registerScreen = new RegisterScreen();
-                registerScreen.setVisible(true);
-            }
-        });
+        mainPanel.add(backButton);
 
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -54,17 +52,15 @@ public class LoginScreen {
                 String username = usernameField.getText();
                 String password = String.valueOf(passwordField.getPassword());
 
-                ArrayList<User> users = Controller.getInstance().getAllUsers();
-
-
-                for (User u : users)
+                ArrayList<Restaurant> restorans = Controller.getInstance().getAllRestoran();
+                for (Restaurant r : restorans)
                 {
-                    if (u.getUsername().equals(username) && u.getPassword().equals(password))
+                    if (r.getUsername().equals(username) && r.getPassword().equals(password))
                     {
-                        Controller.getInstance().currentUser = u;
-                        JOptionPane.showMessageDialog(frame, "Login Success as " + u.getName());
-                        new UserScreen();
+                        Controller.getInstance().currentRestoran = r;
                         frame.setVisible(false);
+                        JOptionPane.showMessageDialog(frame, "Login Success as " + r.getRestaurantName());
+                        new RestoranScreen(Controller.getInstance().currentRestoran);
                         return;
                     }
                 }

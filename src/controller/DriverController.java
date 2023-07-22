@@ -219,7 +219,7 @@ public class DriverController {
             if (transaction.getOrderStatus() == OrderStatus.PENDING) {
                 query = "UPDATE transaksi SET status='IN_PROGRESS' WHERE id_transaksi=" + transaction.getTransactionID();
             } else if (transaction.getOrderStatus() == OrderStatus.IN_PROGRESS) {
-                query = "UPDATE transaksi SET status='SUCCESS' WHERE id_transaksi=" + transaction.getTransactionID();
+                query = "UPDATE transaksi SET status='SUCCESS'  WHERE id_transaksi=" + transaction.getTransactionID();
             }
             Statement stmt = conn.con.createStatement();
             stmt.executeUpdate(query);
