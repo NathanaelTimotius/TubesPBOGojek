@@ -21,168 +21,51 @@ public class RegisterScreen extends JFrame {
     private JRadioButton femaleRadioButton;
     private JDateChooser birthdayDatePicker;
     private JTextField idRegionField;
-    private JFrame frame; 
-    
+
     public RegisterScreen() {
         setTitle("Registrasi");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(500, 400);
+        setSize(500, 600);
         setLocationRelativeTo(null);
-        
-        frame = this;
-        
-        initUI();
+
+        initComponents();
+        addComponentsToPanel();
+        pack(); 
     }
 
-    private void initUI() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-
-        // Name Label and Field
-        JLabel nameLabel = new JLabel("Nama:");
+    private void initComponents() {
         nameField = new JTextField(20);
-
-        // Address Label and Field
-        JLabel addressLabel = new JLabel("Alamat:");
         addressField = new JTextField(20);
-
-        // Phone Number Label and Field
-        JLabel phoneNumberLabel = new JLabel("Nomor Telepon:");
         phoneNumberField = new JTextField(20);
-
-        // Username Label and Field
-        JLabel usernameLabel = new JLabel("Username:");
         usernameField = new JTextField(20);
-
-        // Email Label and Field
-        JLabel emailLabel = new JLabel("Email:");
         emailField = new JTextField(20);
-
-        // Password Label and Field
-        JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(20);
 
-        // Gender Label and Radio Buttons
-        JLabel genderLabel = new JLabel("Jenis Kelamin:");
         maleRadioButton = new JRadioButton("Laki-laki");
         femaleRadioButton = new JRadioButton("Perempuan");
         ButtonGroup genderButtonGroup = new ButtonGroup();
         genderButtonGroup.add(maleRadioButton);
         genderButtonGroup.add(femaleRadioButton);
 
-        // Birthday DatePicker
-        JLabel birthdayLabel = new JLabel("Tanggal Ulang Tahun:");
         birthdayDatePicker = new JDateChooser();
-
-        // Photo FileChooser
-        JLabel idRegion = new JLabel("Region:");
         idRegionField = new JTextField(20);
-        
-        JPanel backPanel = new JPanel();
-        JButton backButton =  new JButton("Kembali");
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                new MainMenuScreen();
-            }
-        });
-        backPanel.add(backButton);
+    }
 
-        // Register Button
-        JButton registerButton = new JButton("Registrasi");
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = nameField.getText();
-                String address = addressField.getText();
-                String phoneNumber = phoneNumberField.getText();
-                String username = usernameField.getText();
-                String email = emailField.getText();
-                char[] password = passwordField.getPassword();
-                String passwordString = new String(password);
-                String passwordStr = new String(password);
-                String gender = maleRadioButton.isSelected() ? "Male" : "Female";
-                Date birthday = new java.sql.Date(birthdayDatePicker.getDate().getTime());
-                int idRegion = Integer.parseInt(idRegionField.getText());
+    private void addComponentsToPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-                if (passwordStr.length() < 8) {
-                    JOptionPane.showMessageDialog(RegisterScreen.this,
-                            "Password harus terdiri dari minimal 8 karakter.",
-                            "Registrasi Gagal", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    User user = new User();
-                    user.setRegion(new Controller().getRegion(idRegion));
-                    user.setName(name);
-                    user.setAddress(address);
-                    user.setPhoneNumber(phoneNumber);
-                    user.setBirthDate(birthday);
-                    user.setUsername(username);
-                    user.setEmail(email);
-                    user.setPassword(passwordString);
-                    user.setGender(gender);
-                    user.setTotalBalance(0);
-                    
-                    boolean berhasil = new Controller().insertToUser(user);
-                    if (berhasil){
-                        frame.dispose();
-                        JOptionPane.showMessageDialog(RegisterScreen.this,
-                            "Registrasi berhasil. Data berhasil disimpan.",
-                            "Registrasi Berhasil", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "Registration Error", "Error", JOptionPane.ERROR_MESSAGE);
-
-                    }
-                    
-                }
-            }
-        });
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        panel.add(nameLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(nameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        panel.add(addressLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(addressField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        panel.add(phoneNumberLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(phoneNumberField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        panel.add(usernameLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(usernameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        panel.add(emailLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(emailField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        panel.add(passwordLabel, gbc);
-
-        gbc.gridx = 1;
-        panel.add(passwordField, gbc);
+        addField(panel, gbc, "Nama:", nameField, 0);
+        addField(panel, gbc, "Alamat:", addressField, 1);
+        addField(panel, gbc, "Nomor Telepon:", phoneNumberField, 2);
+        addField(panel, gbc, "Username:", usernameField, 3);
+        addField(panel, gbc, "Email:", emailField, 4);
+        addField(panel, gbc, "Password:", passwordField, 5);
 
         gbc.gridx = 0;
         gbc.gridy = 6;
-        panel.add(genderLabel, gbc);
+        panel.add(new JLabel("Jenis Kelamin:"), gbc);
 
         gbc.gridx = 1;
         panel.add(maleRadioButton, gbc);
@@ -190,24 +73,19 @@ public class RegisterScreen extends JFrame {
         gbc.gridx = 2;
         panel.add(femaleRadioButton, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 7;
-        panel.add(birthdayLabel, gbc);
+        addField(panel, gbc, "Tanggal Ulang Tahun:", birthdayDatePicker, 7);
+        addField(panel, gbc, "Region:", idRegionField, 8);
 
-        gbc.gridx = 1;
-        panel.add(birthdayDatePicker, gbc);
+        JButton registerButton = new JButton("Registrasi");
+        registerButton.addActionListener(e -> registerUser());
 
-        gbc.gridx = 0;
-        gbc.gridy = 8;
-        panel.add(idRegion, gbc);
-
-        gbc.gridx = 1;
-        panel.add(idRegionField, gbc);
+        JButton backButton = new JButton("Kembali");
+        backButton.addActionListener(e -> goBackToMainMenu());
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(registerButton);
-        buttonPanel.add(backPanel);
-        
+        buttonPanel.add(backButton);
+
         gbc.gridx = 0;
         gbc.gridy = 9;
         gbc.gridwidth = 3;
@@ -217,5 +95,57 @@ public class RegisterScreen extends JFrame {
         JScrollPane scrollPane = new JScrollPane(panel);
         scrollPane.setPreferredSize(new Dimension(480, 250));
         add(scrollPane);
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, String labelName, JComponent component, int yPos) {
+        gbc.gridx = 0;
+        gbc.gridy = yPos;
+        panel.add(new JLabel(labelName), gbc);
+
+        gbc.gridx = 1;
+        panel.add(component, gbc);
+    }
+
+    private void registerUser() {
+        String name = nameField.getText();
+        String address = addressField.getText();
+        String phoneNumber = phoneNumberField.getText();
+        String username = usernameField.getText();
+        String email = emailField.getText();
+        String password = new String(passwordField.getPassword());
+        String gender = maleRadioButton.isSelected() ? "Male" : "Female";
+        Date birthday = new Date(birthdayDatePicker.getDate().getTime());
+        int idRegion = Integer.parseInt(idRegionField.getText());
+
+        if (password.length() < 8) {
+            JOptionPane.showMessageDialog(this,
+                    "Password harus terdiri dari minimal 8 karakter.",
+                    "Registrasi Gagal", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        User user = new User(name, address, phoneNumber, username, email, password, gender, birthday);
+        user.setRegion(new Controller().getRegion(idRegion));
+        user.setTotalBalance(0);
+
+        Controller controller = new Controller();
+        boolean registrationSuccess = controller.insertToUser(user);
+
+        if (registrationSuccess) {
+            JOptionPane.showMessageDialog(this,
+                    "Registrasi berhasil. Data berhasil disimpan.",
+                    "Registrasi Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new LoginScreen();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Registrasi gagal. Terjadi kesalahan.",
+                    "Registrasi Gagal", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void goBackToMainMenu() {
+        dispose();
+        new MainMenuScreen();
     }
 }

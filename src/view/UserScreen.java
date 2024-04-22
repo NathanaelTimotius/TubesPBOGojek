@@ -1,70 +1,89 @@
 package view;
 
 import controller.Controller;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class UserScreen {
 
     public UserScreen() {
-        viewUserScreen();
+        displayUserScreen();
     }
 
-    private static void viewUserScreen() {
-        JFrame frame = new JFrame("User Screen");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
-        frame.setLocationRelativeTo(null);
+    private void displayUserScreen() {
+        JFrame frame = createMainFrame();
+        JPanel mainPanel = createMainPanel(frame);
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setPreferredSize(new Dimension(400, 400));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel profilePanel = createProfilePanel();
+        JPanel buttonPanel = createButtonPanel(frame);
 
-        // Panel atas untuk menampilkan profil pengguna
-        JPanel profilePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel profileLabel = new JLabel("Profil Pengguna");
-        profileLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        profilePanel.add(profileLabel);
-
-        // Panel tengah dengan layout grid 2x2 untuk tombol
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-
-        JButton gojekButton = createIconButton("Gojek","gojek.png", 100, 40, frame);
-        buttonPanel.add(gojekButton);
-
-        JButton gocarButton = createIconButton("Gocar", "gojek.png", 100, 40, frame);
-        buttonPanel.add(gocarButton);
-
-        JButton gofoodButton = createIconButton("Gofood", "gojek.png", 100, 40, frame);
-        buttonPanel.add(gofoodButton);
-
-        JButton gosendButton = createIconButton("Gosend","gojek.png", 100, 40, frame);
-        buttonPanel.add(gosendButton);
-        
-        JButton gopayButton = createIconButton("Gopay","gojek.png", 100, 40, frame);
-        buttonPanel.add(gopayButton);
-        
-        JPanel backPanel = new JPanel();
-        JButton backButton =  new JButton("Kembali");
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                new MainMenuScreen();
-            }
-        });
-        backPanel.add(backButton);
-        
         mainPanel.add(profilePanel, BorderLayout.NORTH);
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
-        mainPanel.add(backPanel, BorderLayout.SOUTH);
-        
+
         frame.getContentPane().add(mainPanel);
         frame.setVisible(true);
     }
 
-    private static JButton createIconButton(String text, String iconName, int width, int height, JFrame frame) {
+    private JFrame createMainFrame() {
+        JFrame frame = new JFrame("User Screen");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 400);
+        frame.setLocationRelativeTo(null);
+        return frame;
+    }
+
+    private JPanel createMainPanel(JFrame frame) {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(400, 400));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JButton backButton = createTextButton("Kembali", e -> {
+            frame.dispose();
+            new MainMenuScreen();
+        });
+
+        JPanel backPanel = new JPanel();
+        backPanel.add(backButton);
+        mainPanel.add(backPanel, BorderLayout.SOUTH);
+
+        return mainPanel;
+    }
+
+    private JPanel createProfilePanel() {
+        JPanel profilePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel profileLabel = new JLabel("Profil Pengguna");
+        profileLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        profilePanel.add(profileLabel);
+        return profilePanel;
+    }
+
+    private JPanel createButtonPanel(JFrame frame) {
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        addButtonToPanel(buttonPanel, "Gojek", "gojek.png", e -> showGojekScreen(frame));
+        addButtonToPanel(buttonPanel, "Gocar", "gojek.png", e -> showGocarScreen(frame));
+        addButtonToPanel(buttonPanel, "Gofood", "gojek.png", e -> showGofoodScreen(frame));
+        addButtonToPanel(buttonPanel, "Gosend", "gojek.png", e -> showGosendScreen(frame));
+        addButtonToPanel(buttonPanel, "Gopay", "gojek.png", e -> showGopayScreen(frame));
+
+        return buttonPanel;
+    }
+
+    private JButton createTextButton(String text, ActionListener listener) {
+        JButton button = new JButton(text);
+        button.addActionListener(listener);
+        return button;
+    }
+
+    private void addButtonToPanel(JPanel panel, String buttonText, String iconName, ActionListener listener) {
+        JButton button = createIconButton(buttonText, iconName);
+        button.addActionListener(listener);
+        panel.add(button);
+    }
+
+    private JButton createIconButton(String text, String iconName) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 18));
         button.setForeground(Color.BLACK);
@@ -73,35 +92,38 @@ public class UserScreen {
         button.setOpaque(true);
 
         ImageIcon icon = new ImageIcon(iconName);
-        Image image = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        ImageIcon scaledIcon = new ImageIcon(image);
+        Image scaledImage = icon.getImage().getScaledInstance(100, 40, Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
         button.setIcon(scaledIcon);
-
-
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Controller();
-                frame.dispose();
-                if (text.equals("Gofood")){
-                    new GoFoodScreen(Controller.getInstance().currentUser);
-                } else if (text.equals("Gojek")){
-                    GoRideScreen goRideScreen = new GoRideScreen(Controller.getInstance().currentUser);
-                    goRideScreen.showMainPage();
-                } else if (text.equals("Gopay")){
-                    new GoPayScreen(Controller.getInstance().currentUser);
-                } else if (text.equals("Gocar")){
-                    GoCarScreen goCarScreen = new GoCarScreen(Controller.getInstance().currentUser);
-                    goCarScreen.showMainPage();
-                } else if (text.equals("Gosend")) {
-                    GoSendScreen goSendScreen = new GoSendScreen(Controller.getInstance().currentUser);
-                    goSendScreen.showMainPage();
-                }
-                
-            }
-        });
-
         return button;
     }
 
+    private void showGojekScreen(JFrame frame) {
+        frame.dispose();
+        GoRideScreen goRideScreen = new GoRideScreen(Controller.getInstance().currentUser);
+        goRideScreen.showMainPage();
+    }
+
+    private void showGocarScreen(JFrame frame) {
+        frame.dispose();
+        GoCarScreen goCarScreen = new GoCarScreen(Controller.getInstance().currentUser);
+        goCarScreen.showMainPage();
+    }
+
+    private void showGofoodScreen(JFrame frame) {
+        frame.dispose();
+        new GoFoodScreen(Controller.getInstance().currentUser);
+    }
+
+    private void showGosendScreen(JFrame frame) {
+        frame.dispose();
+        GoSendScreen goSendScreen = new GoSendScreen(Controller.getInstance().currentUser);
+        goSendScreen.showMainPage();
+    }
+
+    private void showGopayScreen(JFrame frame) {
+        frame.dispose();
+        new GoPayScreen(Controller.getInstance().currentUser);
+    }
 }

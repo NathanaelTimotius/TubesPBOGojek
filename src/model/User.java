@@ -29,6 +29,17 @@ public class User extends Person{
         this.region = region;
     }
 
+
+
+    public User(String name, String address, String phoneNumber, String username2, String email2, String password2,
+            String gender2, Date birthday) {
+        super(name, address, phoneNumber, birthday);
+        this.username = username2;
+        this.email = email2;
+        this.password = password2;
+        this.gender = gender2;
+    }
+
     public String getEmail() {
         return email;
     }
