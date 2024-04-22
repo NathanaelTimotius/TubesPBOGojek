@@ -9,9 +9,9 @@ import model.Cart;
 import model.Driver;
 import model.Gofood;
 import model.Goride;
+import model.Gosend;
 import model.OrderStatus;
 import model.PaymentMethod;
-import model.Region;
 import model.Transaction;
 import model.Vehicle;
 import model.VehicleType;
@@ -140,9 +140,9 @@ public class DriverController {
                 gofood = new Gofood();
                 gofood.setTransactionID(rs.getInt("id_transaksi"));
                 gofood.setRestaurantName(rs.getString("restoran_name"));
-                gofood.setCart(getAllCartPerGroup(rs.getInt("id_cart")));
                 gofood.setTitikAntar(rs.getInt("id_region_antar"));
                 gofood.setDistance(rs.getDouble("distance"));
+                gofood.setDeliveryFee(rs.getDouble("delivery_fee"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,25 +151,30 @@ public class DriverController {
         }
         return gofood;
     }
-    
-    public ArrayList<Cart> getAllCartPerGroup(int cartGroup){
-        conn.connect();
-        String query = "SELECT * FROM cart WHERE cart_group = '" + cartGroup + "'";
-        ArrayList<Cart> carts = new ArrayList<>();
+
+    public Gosend getPendingGoSend(int transactionID) {
+       Gosend gosend = null;
         try {
+            conn.connect();
+            String query = "SELECT * FROM gosend WHERE id_transaksi = " + transactionID;
             Statement stmt = conn.con.createStatement();
             ResultSet rs = stmt.executeQuery(query);
-            while (rs.next()) {
-                Cart cart = new Cart();
-                cart.setQuantity(rs.getInt("quantity"));
-                cart.setMenu(new Controller().getMenu(rs.getInt("id_menu")));
-                carts.add(cart);
+            if (rs.next()) {
+                gosend = new Gosend();
+                gosend.setTransactionID(rs.getInt("id_transaksi"));
+                gosend.setDestination(rs.getInt("id_region_antar"));
+                gosend.setItem(rs.getString("item_naem"));
+                gosend.setReceiverName(rs.getString("nama_penerima"));
+                gosend.setDistance(rs.getDouble("distance"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            conn.disconnect();
         }
-        return (carts);
+        return gosend;
     }
+
     
     public Voucher getVoucher(int id){
         Voucher voucher = null;
@@ -232,10 +237,42 @@ public class DriverController {
         }
     }
 
-    public boolean setDriverGoride(Goride goride, Driver driver){
+    public boolean updateIncomeDriver(Driver driver, double deliveryFee) {
         try {
             conn.connect();
-            String query = "UPDATE goride SET id_driver=" + driver.getDriverID() + " WHERE id_gojek=" + goride.getTransactionID();
+            String query = "UPDATE driver SET income = income +" + deliveryFee + " WHERE id_driver = " + driver.getDriverID();
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error");
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    public boolean setDriverGoride(Goride goride, Driver driver, double deliveryFee){
+        try {
+            conn.connect();
+            String query = "UPDATE goride SET id_driver =" + driver.getDriverID() + ", delivery_fee = " + deliveryFee +" WHERE id_transaksi = " + goride.getTransactionID();
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error");
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+    
+    public boolean setDriverGofood(Gofood gofood, Driver driver){
+        try {
+            conn.connect();
+            String query = "UPDATE gofood SET id_driver=" + driver.getDriverID() + " WHERE id_transaksi=" + gofood.getTransactionID();
             Statement stmt = conn.con.createStatement();
             stmt.executeUpdate(query);
             return true;
@@ -246,11 +283,11 @@ public class DriverController {
             conn.disconnect();
         }
     }
-    
-    public boolean setDriverGofood(Gofood gofood, Driver driver){
+
+    public boolean setDriverGosend(Gosend gosend, Driver driver){
         try {
             conn.connect();
-            String query = "UPDATE gofood SET id_driver=" + driver.getDriverID() + " WHERE id_gofood=" + gofood.getTransactionID();
+            String query = "UPDATE gosend SET id_driver=" + driver.getDriverID() + " WHERE id_transaksi=" + gosend.getTransactionID();
             Statement stmt = conn.con.createStatement();
             stmt.executeUpdate(query);
             return true;
@@ -288,4 +325,5 @@ public class DriverController {
         }
         return text;
     }
+
 }

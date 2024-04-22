@@ -10,43 +10,57 @@ import model.*;
 
 public class DriverLoginScreen {
 
-    private JTextField nikField;
+    private static final int FRAME_WIDTH = 300;
+    private static final int FRAME_HEIGHT = 200;
+
+    private JTextField usernameField;
     private JPasswordField passwordField;
 
     public DriverLoginScreen() {
-        JFrame frame = new JFrame();
-        frame.setTitle("Login");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(300, 200);
-        frame.setLocationRelativeTo(null);
+        JFrame frame = createFrame("Login");
+        JPanel mainPanel = createMainPanel();
 
-        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        JLabel nikLabel = new JLabel("NIK:");
-        nikField = new JTextField();
+        JLabel nikLabel = new JLabel("Username:");
+        usernameField = new JTextField();
 
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
 
+        JButton backButton = createBackButton(frame);
+        JButton loginButton = createLoginButton(frame);
+
+        addComponentsToPanel(mainPanel, nikLabel, usernameField, passwordLabel, passwordField, loginButton, backButton);
+
+        frame.getContentPane().add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    private JFrame createFrame(String title) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        frame.setLocationRelativeTo(null);
+        return frame;
+    }
+
+    private JPanel createMainPanel() {
+        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return mainPanel;
+    }
+
+    private JButton createLoginButton(JFrame frame) {
         JButton loginButton = new JButton("Login");
-
-        mainPanel.add(nikLabel);
-        mainPanel.add(nikField);
-        mainPanel.add(passwordLabel);
-        mainPanel.add(passwordField);
-        mainPanel.add(loginButton);
-
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String nik = nikField.getText();
+                String username = usernameField.getText();
                 String password = String.valueOf(passwordField.getPassword());
 
                 ArrayList<Driver> drivers = Controller.getInstance().getAllDrivers();
                 for (Driver d : drivers)
                 {
-                    if (d.getNIK().equals(nik) && d.getPassword().equals(password))
+                    if (d.getUsername().equals(username) && d.getPassword().equals(password))
                     {
                         Controller.getInstance().currentDriver = d;
                         JOptionPane.showMessageDialog(frame, "Login Success as " + d.getName());
@@ -61,8 +75,23 @@ public class DriverLoginScreen {
 
             }
         });
+        return loginButton;
+    }
 
-        frame.getContentPane().add(mainPanel);
-        frame.setVisible(true);
+    private void addComponentsToPanel(JPanel panel, Component... components) {
+        for (Component component : components) {
+            panel.add(component);
+        }
+    }
+
+    private JButton createBackButton(JFrame frame) {
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new MainMenuScreen();
+            }
+        });
+        return backButton;
     }
 }

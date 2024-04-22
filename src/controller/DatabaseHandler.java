@@ -15,6 +15,7 @@ public class DatabaseHandler {
     private String username = "root";
     private String password = "";
 
+    @SuppressWarnings("deprecation")
     private Connection logOn() {
         try {
             //Load JDBC Driver

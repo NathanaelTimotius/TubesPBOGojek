@@ -1,5 +1,6 @@
 package controller;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,7 @@ import model.*;
 public class Controller {
     private static Controller single_instance = null;
 
-    public static synchronized Controller getInstance()
+    public synchronized static Controller getInstance()
     {
         if (single_instance == null)
             single_instance = new Controller();
@@ -94,9 +95,11 @@ public class Controller {
                 driver.setPhoneNumber(rs.getString("phoneNumber"));
                 driver.setBirthDate(rs.getDate("birthDate"));
                 driver.setNIK(rs.getString("NIK"));
+                driver.setUsername(rs.getString("username"));
                 driver.setPassword(rs.getString("password"));
                 driver.setIncome(rs.getDouble("income"));
                 driver.setAvailable(rs.getBoolean("available"));
+                driver.setDriverID(rs.getInt("id_driver"));
                 drivers.add(driver);
             }
         } catch (SQLException e) {
@@ -344,15 +347,13 @@ public class Controller {
     }
     
     public boolean insertToCart(ArrayList<Cart> listCart){
-        int cartGroup = getLastCartGroup() + 1;
         try {
             conn.connect();
-            String query = "INSERT INTO cart(cart_group, id_menu, quantity) VALUES(?,?,?)";
+            String query = "INSERT INTO cart(id_menu, quantity) VALUES(?,?)";
             PreparedStatement stmt = conn.con.prepareStatement(query);
             for (Cart cart : listCart) {
-                stmt.setInt(1, cartGroup);
-                stmt.setInt(2, getMenuId(cart.getMenu()));
-                stmt.setInt(3, cart.getQuantity());
+                stmt.setInt(1, getMenuId(cart.getMenu()));
+                stmt.setInt(2, cart.getQuantity());
                 stmt.executeUpdate();
             }
             return true;
@@ -367,15 +368,14 @@ public class Controller {
     public boolean insertToGoFood(Gofood gofood){
         try {
             conn.connect();
-            String query = "INSERT INTO gofood(id_transaksi, id_restoran, id_cart, distance, restoran_name, delivery_fee, id_region_antar) VALUES(?,?,?,?,?,?,?)";
+            String query = "INSERT INTO gofood(id_transaksi, id_restoran, distance, restoran_name, delivery_fee, id_region_antar) VALUES(?,?,?,?,?,?)";
             PreparedStatement stmt = conn.con.prepareStatement(query);
             stmt.setInt(1, gofood.getTransactionID());
             stmt.setInt(2, gofood.getRestaurantID());
-            stmt.setInt(3, getLastCartGroup());
-            stmt.setDouble(4, gofood.getDistance());
-            stmt.setString(5, gofood.getRestaurantName());
-            stmt.setDouble(6, gofood.getDeliveryFee());
-            stmt.setInt(7, gofood.getTitikAntar());
+            stmt.setDouble(3, gofood.getDistance());
+            stmt.setString(4, gofood.getRestaurantName());
+            stmt.setDouble(5, gofood.getDeliveryFee());
+            stmt.setInt(6, gofood.getTitikAntar());
             
             stmt.executeUpdate();
             return true;
@@ -548,24 +548,6 @@ public class Controller {
             conn.disconnect();
         }
     }
-    
-    public int getLastCartGroup() {
-        try {
-            conn.connect();
-            String query = "SELECT * FROM cart ORDER BY id_cart DESC LIMIT 1;";
-            PreparedStatement stmt = conn.con.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("cart_group");
-            }
-            return 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        } finally {
-            conn.disconnect();
-        }
-    }
 
     public int getBiayaOngkir(int tempRegion, int idRegionRestoran){
         int biayaOngkir = 5000;
@@ -601,4 +583,95 @@ public class Controller {
             return totalBiaya;
         }
     }
+
+    public boolean addRegion(String name, int position) {
+        String sql = "INSERT INTO region (regionName, regionPosition) VALUES (?, ?)";
+        conn.connect();
+        try (PreparedStatement statement = conn.con.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setInt(2, position);
+
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addRestoran(int region, String name, String phoneNumber, String password, String username ) {
+        String sql = "INSERT INTO restoran (id_region, restaurantName, phoneNumber, password, username) VALUES (?, ?, ?, ?, ?)";
+        conn.connect();
+        try (PreparedStatement statement = conn.con.prepareStatement(sql)) {
+            statement.setInt(1, region);
+            statement.setString(2, name);
+            statement.setString(3, phoneNumber);
+            statement.setString(4, password);
+            statement.setString(5, username);
+
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addDriver(String name, String phoneNumber, Date birthDate, String NIK, String password, String username, String jenisKendaraan, String modelKendaraan, String numberPlate) {
+        if (!addKendaraan(jenisKendaraan, modelKendaraan, numberPlate)){
+            return false;
+        }
+        
+        String sql = "INSERT INTO driver (name, phoneNumber, birthDate, NIK, password, username, id_kendaraan) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        conn.connect();
+        int idKendaraan = getLastIdKendaraan();
+        try (PreparedStatement statement = conn.con.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setString(2, phoneNumber);
+            statement.setDate(3, birthDate);
+            statement.setString(4, NIK);
+            statement.setString(5, password);
+            statement.setString(6, username);
+            statement.setInt(7, idKendaraan);
+
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addKendaraan(String jenisKendaraan, String modelKendaraan, String numberPlate){
+        String sql = "INSERT INTO kendaraan (jenisKendaraan, modelKendaraan, numberPlate) VALUES (?,?,?)";
+        conn.connect();
+        try (PreparedStatement statement = conn.con.prepareStatement(sql)) {
+            statement.setString(1, jenisKendaraan);
+            statement.setString(2, modelKendaraan);
+            statement.setString(3, numberPlate);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } 
+    }
+
+    public int getLastIdKendaraan() {
+        try {
+            conn.connect();
+            String query = "SELECT id_kendaraan FROM kendaraan ORDER BY id_kendaraan DESC LIMIT 1";
+            PreparedStatement stmt = conn.con.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("id_kendaraan");
+            }
+            return 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } 
+    }
+    
 }

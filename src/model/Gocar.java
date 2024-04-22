@@ -5,23 +5,23 @@ import java.util.Date;
 public class Gocar extends Transaction {
     private Driver driver;
     private double distance;
-    private Region titikAntar;
-    private Region titikJemput;
-    private double deliveryFee;
-    private CarType carType;
+    private int titikAntar;
+    private int titikJemput;
 
-    public Gocar (){
-        
+    public Gocar() {
+
     }
 
-    public Gocar(Driver driver, double distance, Region titikAntar, Region titikJemput, double deliveryFee, CarType carType, int userID, int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount, double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee, OrderStatus orderStatus) {
-        super(userID, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee, orderStatus);
+    public Gocar(Driver driver, double distance, int titikAntar, int titikJemput, double deliveryFee, int userID,
+            int serviceID, PaymentMethod paymentMethod, Voucher voucher, double totalPrice, double totalDiscount,
+            double priceAfterDiscount, Date transactionDate, int transactionID, double adminFee,
+            OrderStatus orderStatus) {
+        super(userID, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate,
+                transactionID, adminFee, orderStatus);
         this.driver = driver;
         this.distance = distance;
         this.titikAntar = titikAntar;
         this.titikJemput = titikJemput;
-        this.deliveryFee = deliveryFee;
-        this.carType = carType;
     }
 
     public Driver getDriver() {
@@ -40,41 +40,24 @@ public class Gocar extends Transaction {
         this.distance = distance;
     }
 
-    public Region getTitikAntar() {
+    public int getTitikAntar() {
         return titikAntar;
     }
 
-    public void setTitikAntar(Region titikAntar) {
+    public void setTitikAntar(int titikAntar) {
         this.titikAntar = titikAntar;
     }
 
-    public Region getTitikJemput() {
-        return titikJemput;
-    }
-
-    public void setTitikJemput(Region titikJemput) {
+    public void setTitikJemput(int titikJemput) {
         this.titikJemput = titikJemput;
     }
 
-    public double getDeliveryFee() {
-        return deliveryFee;
+    public int getTitikJemput() {
+        return titikJemput;
     }
 
-    public void setDeliveryFee(double deliveryFee) {
-        this.deliveryFee = deliveryFee;
-    }
-
-    public CarType getCarType() {
-        return carType;
-    }
-
-    public void setCarType(CarType carType) {
-        this.carType = carType;
-    }
-
-    @Override
     public String toString() {
-        return "Gocar{" + "driver=" + driver + ", distance=" + distance + ", titikAntar=" + titikAntar + ", titikJemput=" + titikJemput + ", deliveryFee=" + deliveryFee + ", carType=" + carType + '}';
+        return "Gojek{" + "driver=" + driver + ", distance=" + distance + ", titikAntar=" + titikAntar
+                + ", titikJemput=" + titikJemput + ", deliveryFee=" + '}';
     }
-    
 }

@@ -5,17 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import model.Gosend;
+import model.Gocar;
 import model.Transaction;
 
-public class GoSendController {
+
+public class GoCarController {
     private DatabaseHandler conn;
-    
-    public GoSendController(){
+
+    public GoCarController(){
         this.conn = new DatabaseHandler();
     }
-
-    public boolean insertGoSendTransaction(Transaction transaction){
+    
+    public boolean insertGoCarTransaction(Transaction transaction){
         try {
             conn.connect();
             String query = "INSERT INTO transaksi(serviceId, paymentMethod, totalPrice, adminFee, totalDiscount, finalPrice, transactionDate, status, id_user, id_voucher) VALUES(?,?,?,?,?,?,?,?,?,?)";
@@ -28,6 +29,7 @@ public class GoSendController {
             stmt.setDouble(6, transaction.getPriceAfterDiscount());
             Date transactionDate = new Date(transaction.getTransactionDate().getTime());
             stmt.setDate(7, transactionDate);
+            System.out.println(transaction.getOrderStatus().name());
             stmt.setString(8, transaction.getOrderStatus().name());
             stmt.setInt(9, transaction.getUserID());
 
@@ -46,17 +48,16 @@ public class GoSendController {
             conn.disconnect();
         }
     }
-    
-    public boolean insertToGoSend(Gosend gosend){
+
+    public boolean insertToGoCar(Gocar gocar){
         try {
             conn.connect();
-            String query = "INSERT INTO gosend(id_transaksi, id_region_antar, item_name, nama_penerima, distance) VALUES(?,?,?,?,?)";
+            String query = "INSERT INTO gocar(id_transaksi, id_region_antar, id_region_jemput, distance) VALUES(?,?,?,?)";
             PreparedStatement stmt = conn.con.prepareStatement(query);
-            stmt.setInt(1, gosend.getTransactionID());
-            stmt.setInt(2, gosend.getDestination());
-            stmt.setString(3, gosend.getItem());
-            stmt.setString(4, gosend.getReceiverName());
-            stmt.setDouble(5, gosend.getDistance());
+            stmt.setInt(1, gocar.getTransactionID());
+            stmt.setInt(2, gocar.getTitikAntar());
+            stmt.setInt(3, gocar.getTitikJemput());
+            stmt.setDouble(4, gocar.getDistance());
 
             stmt.executeUpdate();
             return true;

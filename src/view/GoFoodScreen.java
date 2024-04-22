@@ -1,6 +1,7 @@
 package view;
 
 import controller.Controller;
+import controller.GoController;
 import controller.GoRideController;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -355,7 +356,7 @@ public class GoFoodScreen {
                     if (voucherField.getText().isEmpty()) {
                         voucher = null;
                     } else {
-                        voucher = new GoRideController().getVoucher(voucherField.getText());
+                        voucher = new GoController().getVoucher(voucherField.getText());
                         if (voucher != null) {
                             totalDiscount = totalBiaya * voucher.getDiscountPercentage() / 100;
                         } else {
@@ -410,6 +411,7 @@ public class GoFoodScreen {
             confirmationMessage += cart.getMenu().getMenuName() + ": ";
             confirmationMessage += cart.getQuantity() + "\n";
         }
+        new Gofood().setCart(listCart);
         confirmationMessage += "\nTujuan: " + cart.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName()
                 + "\nTotal Pembayaran: " + transaction.getPriceAfterDiscount()
                 + "\nMetode Pembayaran: " + transaction.getPaymentMethod().name();
@@ -421,7 +423,7 @@ public class GoFoodScreen {
             if (transaction.getPaymentMethod() == PaymentMethod.GOPAY) { // GOPAY ??
                 if (currentUser.getTotalBalance() >= transaction.getPriceAfterDiscount()) { // CEK SALDO
                     currentUser.setTotalBalance(currentUser.getTotalBalance() - transaction.getPriceAfterDiscount());
-                    new GoRideController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
+                    new GoController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
                 } else {
                     JOptionPane.showMessageDialog(frame, "Saldo GOPAY tidak cukup");
                     lanjut = false; // GA BISA LANJUT
@@ -434,7 +436,7 @@ public class GoFoodScreen {
                     
                     if (berhasil2){
                         Gofood gofood = new Gofood();
-                        gofood.setTransactionID(new GoRideController().getTransactionID(transaction));
+                        gofood.setTransactionID(new GoController().getTransactionID(transaction));
 
                         int destination = Integer.parseInt(destinationField.getText());
                         gofood.setTitikAntar(destination);
@@ -451,9 +453,13 @@ public class GoFoodScreen {
                         boolean berhasil3 = new Controller().insertToGoFood(gofood);
                         if (berhasil3) {
                             boolean berhasil4 = new Controller().updateIncomeRestoran(gofood.getRestaurantID(), incomeRestoran);
-                            JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
+                            if (berhasil4) {
+                                JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
+                            } else {
+                                JOptionPane.showMessageDialog(frame, "Pembayaran gagal 4");
+                            }
                         } else {
-                            JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
+                            JOptionPane.showMessageDialog(frame, "Pembayaran gagal 3");
                         }
                     } else {
                         JOptionPane.showMessageDialog(frame, "Pembayaran gagal");

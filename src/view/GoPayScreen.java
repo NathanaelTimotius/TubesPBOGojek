@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import controller.Controller;
+import controller.GoController;
 import controller.GoRideController;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -130,32 +126,27 @@ public class GoPayScreen {
                 boolean berhasil = new GoRideController().insertGoRideTransaction(transaction);
                 if (berhasil){
                     Gopay gopay = new Gopay();
-                    gopay.setTransactionID(new GoRideController().getTransactionID(transaction));
+                    gopay.setTransactionID(new GoController().getTransactionID(transaction));
                     gopay.setTopUpBalance(topUp);
-                    
-                    boolean berhasil2 = new Controller().insertToGoPay(gopay);
-                    
-                    if (berhasil2) {
-                        boolean berhasil3 = new Controller().updateUserTotalBalance(topUp, currentUser);
-                        if (berhasil3){
-                            String username = currentUser.getUsername();
-                            String password = currentUser.getPassword();
+                                        
+                    boolean berhasil3 = new Controller().updateUserTotalBalance(topUp, currentUser);
+                    if (berhasil3){
+                        String username = currentUser.getUsername();
+                        String password = currentUser.getPassword();
 
-                            ArrayList<User> users = Controller.getInstance().getAllUsers();
+                        ArrayList<User> users = Controller.getInstance().getAllUsers();
 
-                            for (User u : users) {
-                                if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                                    Controller.getInstance().currentUser = u;
-                                    break;
-                                }
+                        for (User u : users) {
+                            if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
+                                Controller.getInstance().currentUser = u;
+                                break;
                             }
-                            JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
-                        } else {
-                            JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
                         }
+                        JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
                     } else {
-                        JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
+                        JOptionPane.showMessageDialog(frame, "Pembayaran gagal, sql error");
                     }
+                    
                 } else {
                     JOptionPane.showMessageDialog(frame, "Pembayaran gagal");
                 }

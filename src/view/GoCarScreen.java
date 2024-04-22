@@ -1,13 +1,11 @@
 package view;
 
-import java.awt.*;
 import javax.swing.*;
 
 import controller.Controller;
+import controller.GoCarController;
 import controller.GoController;
-import controller.GoRideController;
-
-import model.Goride;
+import model.Gocar;
 import model.OrderStatus;
 import model.User;
 import model.PaymentMethod;
@@ -16,12 +14,13 @@ import model.Region;
 import model.Transaction;
 import model.Voucher;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.ArrayList;
 
-public class GoRideScreen {
+public class GoCarScreen {
     private User currentUser;
     private JFrame frame;
     private JLabel nameLabel;
@@ -30,7 +29,7 @@ public class GoRideScreen {
     private JTextField pickupField;
     private JTextField destinationField;
 
-    public GoRideScreen(User user) {
+    public GoCarScreen(User user) {
         currentUser = user;
     }
 
@@ -47,7 +46,7 @@ public class GoRideScreen {
 
         nameLabel = new JLabel("Nama: " + currentUser.getName());
         balanceLabel = new JLabel("Saldo GoPay: " + currentUser.getTotalBalance());
-        JButton goRideButton = new JButton("Pesan GoRide");
+        JButton goCarButton = new JButton("Pesan GoCar");
 
         JButton backButton =  new JButton("Kembali");
         backButton.addActionListener(new ActionListener() {
@@ -59,23 +58,23 @@ public class GoRideScreen {
         
         panel.add(nameLabel);
         panel.add(balanceLabel);
-        panel.add(goRideButton);
+        panel.add(goCarButton);
         panel.add(backButton);
         
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
 
-        goRideButton.addActionListener(new ActionListener() {
+        goCarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                showGoRidePage();
+                showGoCarPage();
             }
         });
     }
 
-    public void showGoRidePage() {
-        frame = new JFrame("GoRide - GoJek");
+    public void showGoCarPage() {
+        frame = new JFrame("GoCar - GoJek");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(350, 600);
         frame.setLayout(new BorderLayout());
@@ -167,7 +166,7 @@ public class GoRideScreen {
         countY++;
         gb.gridy = countY;
         gb.anchor = GridBagConstraints.EAST;
-        JButton orderButton = new JButton("Pesan GoRide");
+        JButton orderButton = new JButton("Pesan GoCar");
         orderButton.setPreferredSize(new Dimension(80, orderButton.getPreferredSize().height));
         panel.add(orderButton, gb);
 
@@ -209,19 +208,19 @@ public class GoRideScreen {
 
                 double adminFee = 2000;
 
-                Transaction transaction = new Transaction(currentUser.getUserID(), Service.GORIDE, paymentMethod,
+                Transaction transaction = new Transaction(currentUser.getUserID(), Service.GOCAR, paymentMethod,
                         voucher, totalPrice, totalDiscount, priceAfterDiscount, now, 0, adminFee, OrderStatus.PENDING);
 
                 if (isValid) {
-                    orderGoRide(transaction);
+                    orderGoCar(transaction);
                 }
             }
         });
     }
 
-    public void orderGoRide(Transaction transaction) {
-        // Logika bisnis untuk memesan GoRide
-        String confirmationMessage = "Pemesanan GoRide sukses!\n"
+    public void orderGoCar(Transaction transaction) {
+        // Logika bisnis untuk memesan GoCar
+        String confirmationMessage = "Pemesanan GoCar sukses!\n"
                 + "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName()
                 + "\nTujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName()
                 + "\nTotal Pembayaran: " + transaction.getPriceAfterDiscount()
@@ -241,23 +240,23 @@ public class GoRideScreen {
                 }
             }
             if (lanjut) {
-                boolean berhasil = new GoRideController().insertGoRideTransaction(transaction);
+                boolean berhasil = new GoCarController().insertGoCarTransaction(transaction);
                 if (berhasil) {
-                    Goride goride = new Goride();
-                    goride.setTransactionID(new GoController().getTransactionID(transaction));
+                    Gocar gocar = new Gocar();
+                    gocar.setTransactionID(new GoController().getTransactionID(transaction));
 
                     int pickUp = Integer.parseInt(pickupField.getText());
                     int destination = Integer.parseInt(destinationField.getText());
-                    goride.setTitikJemput(pickUp);
-                    goride.setTitikAntar(destination);
+                    gocar.setTitikJemput(pickUp);
+                    gocar.setTitikAntar(destination);
 
                     if (destination >= pickUp) {
-                        goride.setDistance(destination - pickUp);
+                        gocar.setDistance(destination - pickUp);
                     } else {
-                        goride.setDistance(pickUp - destination);
+                        gocar.setDistance(pickUp - destination);
                     }
 
-                    boolean berhasil2 = new GoRideController().insertToGoRide(goride);
+                    boolean berhasil2 = new GoCarController().insertToGoCar(gocar);
                     if (berhasil2){
                         JOptionPane.showMessageDialog(frame, "Pembayaran berhasil");
                     } else {

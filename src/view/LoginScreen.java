@@ -20,7 +20,7 @@ public class LoginScreen {
         frame.setSize(300, 200);
         frame.setLocationRelativeTo(null);
 
-        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        JPanel mainPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel usernameLabel = new JLabel("Username:");
@@ -32,12 +32,21 @@ public class LoginScreen {
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
 
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new MainMenuScreen();
+            }
+        });
+
         mainPanel.add(usernameLabel);
         mainPanel.add(usernameField);
         mainPanel.add(passwordLabel);
         mainPanel.add(passwordField);
         mainPanel.add(loginButton);
         mainPanel.add(registerButton);
+        mainPanel.add(backButton);
         
         registerButton.addActionListener(new ActionListener(){
             @Override

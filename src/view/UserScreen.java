@@ -31,29 +31,19 @@ public class UserScreen {
         // Panel tengah dengan layout grid 2x2 untuk tombol
         JPanel buttonPanel = new JPanel(new GridLayout(2, 2, 10, 10));
 
-        JButton gojekButton = createIconButton("Gojek",
-                "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40, frame);
+        JButton gojekButton = createIconButton("Gojek","gojek.png", 100, 40, frame);
         buttonPanel.add(gojekButton);
 
-        JButton gocarButton = createIconButton("Gocar",
-                "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40, frame);
+        JButton gocarButton = createIconButton("Gocar", "gojek.png", 100, 40, frame);
         buttonPanel.add(gocarButton);
 
-        JButton gofoodButton = createIconButton("Gofood",
-                "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40, frame);
+        JButton gofoodButton = createIconButton("Gofood", "gojek.png", 100, 40, frame);
         buttonPanel.add(gofoodButton);
 
-        JButton gosendButton = createIconButton("Gosend",
-                "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40, frame);
+        JButton gosendButton = createIconButton("Gosend","gojek.png", 100, 40, frame);
         buttonPanel.add(gosendButton);
         
-        JButton gopayButton = createIconButton("Gopay",
-                "C:\\Users\\hp\\OneDrive\\Desktop\\Jason\\Kuliah\\Semester Pendek 1\\Praktikum PBO\\TubesPBOGojek\\src\\view\\gojek.png",
-                100, 40, frame);
+        JButton gopayButton = createIconButton("Gopay","gojek.png", 100, 40, frame);
         buttonPanel.add(gopayButton);
         
         JPanel backPanel = new JPanel();
@@ -77,8 +67,8 @@ public class UserScreen {
     private static JButton createIconButton(String text, String iconName, int width, int height, JFrame frame) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 18));
-        button.setForeground(Color.WHITE);
-        button.setBackground(Color.GREEN);
+        button.setForeground(Color.BLACK);
+        button.setBackground(new Color(0, 255, 51));
         button.setFocusPainted(false);
         button.setOpaque(true);
 
@@ -88,20 +78,23 @@ public class UserScreen {
 
         button.setIcon(scaledIcon);
 
+
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                new Controller();
                 frame.dispose();
                 if (text.equals("Gofood")){
-                    new GoFoodScreen(new Controller().getInstance().currentUser);
+                    new GoFoodScreen(Controller.getInstance().currentUser);
                 } else if (text.equals("Gojek")){
-                    GoRideScreen goRideScreen = new GoRideScreen(new Controller().getInstance().currentUser);
+                    GoRideScreen goRideScreen = new GoRideScreen(Controller.getInstance().currentUser);
                     goRideScreen.showMainPage();
                 } else if (text.equals("Gopay")){
-                    new GoPayScreen(new Controller().getInstance().currentUser);
+                    new GoPayScreen(Controller.getInstance().currentUser);
                 } else if (text.equals("Gocar")){
-                    
+                    GoCarScreen goCarScreen = new GoCarScreen(Controller.getInstance().currentUser);
+                    goCarScreen.showMainPage();
                 } else if (text.equals("Gosend")) {
-                    GoSendScreen goSendScreen = new GoSendScreen(new Controller().getInstance().currentUser);
+                    GoSendScreen goSendScreen = new GoSendScreen(Controller.getInstance().currentUser);
                     goSendScreen.showMainPage();
                 }
                 

@@ -44,5 +44,4 @@ public class Menu {
         return "Menu{" + "menuName=" + menuName + ", menuType=" + menuType + ", price=" + price + '}';
     }
     
-    
 }

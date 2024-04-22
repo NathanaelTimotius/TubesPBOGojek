@@ -1,11 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package view;
 
 import javax.swing.*;
+
+import controller.Controller;
+import controller.GoController;
 import controller.GoSendController;
 import model.*;
 import model.OrderStatus;
@@ -14,10 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.ArrayList;
-/**
- *
- * @author Asus
- */
+
 public class GoSendScreen{
     private User currentUser;
     private JFrame frame;
@@ -38,18 +33,28 @@ public class GoSendScreen{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(300, 200);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 1, 10, 10));
+        panel.setLayout(new GridLayout(4, 1, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         nameLabel = new JLabel("Nama: " + currentUser.getName());
         balanceLabel = new JLabel("Saldo GoPay: " + currentUser.getTotalBalance());
         JButton goSendButton = new JButton("Pesan GoSend");
 
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new UserScreen();
+            }
+        });
+
         panel.add(nameLabel);
         panel.add(balanceLabel);
         panel.add(goSendButton);
+        panel.add(backButton);
 
         frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
@@ -68,6 +73,7 @@ public class GoSendScreen{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(350, 600);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
@@ -86,7 +92,7 @@ public class GoSendScreen{
         gb.weightx = 0;
         gb.anchor = GridBagConstraints.WEST;
         int countY = 1;
-        regions = new GoSendController().getAllRegions();
+        regions = new Controller().getAllRegion();
         for (Region region : regions) {
             gb.gridx = 0;
             gb.gridy = countY;
@@ -130,7 +136,7 @@ public class GoSendScreen{
         JLabel receiverNameLabel = new JLabel("Nama Penerima:");
         panel.add(receiverNameLabel, gb);
         gb.gridx = 1;
-        JTextField receiverNameField = new JTextField();
+        receiverNameField = new JTextField();
         panel.add(receiverNameField, gb);
 
         countY++;
@@ -139,7 +145,7 @@ public class GoSendScreen{
         JLabel itemNameLabel = new JLabel("Nama Item:");
         panel.add(itemNameLabel, gb);
         gb.gridx = 1;
-        JTextField itemNameField = new JTextField();
+        itemNameField = new JTextField();
         panel.add(itemNameField, gb);
         
         countY++;
@@ -201,7 +207,7 @@ public class GoSendScreen{
                 if (voucherField.getText().isEmpty()) {
                     voucher = null;
                 } else {
-                    voucher = new GoSendController().getVoucher(voucherField.getText());
+                    voucher = new GoController().getVoucher(voucherField.getText());
                     if (voucher != null) {
                         totalDiscount = totalPrice * voucher.getDiscountPercentage() / 100;
                     } else {
@@ -219,23 +225,19 @@ public class GoSendScreen{
                         voucher, totalPrice, totalDiscount, priceAfterDiscount, now, 0, adminFee, OrderStatus.PENDING);
 
                 if (isValid) {
-                    orderGoRide(transaction);
+                    orderGoSend(transaction);
                 }
             }
         });
     }
 
-    public void orderGoRide(Transaction transaction) {
-        // Logika bisnis untuk memesan GoSend
-        
-        String receiverName = receiverNameField.getText(); // Mendapatkan nama penerima dari input
-        String itemName = itemNameField.getText(); // Mendapatkan nama item dari input
+    public void orderGoSend(Transaction transaction) {        
         
         String confirmationMessage = "Pemesanan GoSend sukses!\n"
                 + "Lokasi Penjemputan: " + regions.get(Integer.parseInt(pickupField.getText()) - 1).getRegionName()
                 + "\nTujuan: " + regions.get(Integer.parseInt(destinationField.getText()) - 1).getRegionName()
-                + "\nNama Penerima: " +receiverName
-                + "\nNama Item: " +itemName
+                + "\nNama Penerima: " + receiverNameField.getText()
+                + "\nNama Item: " + itemNameField.getText()
                 + "\nTotal Pembayaran: " + transaction.getPriceAfterDiscount()
                 + "\nMetode Pembayaran: " + transaction.getPaymentMethod().name();
         int confirm = JOptionPane.showConfirmDialog(frame, confirmationMessage, "Confirmation",
@@ -246,7 +248,7 @@ public class GoSendScreen{
             if (transaction.getPaymentMethod() == PaymentMethod.GOPAY) { // GOPAY ??
                 if (currentUser.getTotalBalance() >= transaction.getPriceAfterDiscount()) { // CEK SALDO
                     currentUser.setTotalBalance(currentUser.getTotalBalance() - transaction.getPriceAfterDiscount());
-                    new GoSendController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
+                    new GoController().updateGoPay(currentUser.getUsername(), currentUser.getTotalBalance());
                 } else {
                     JOptionPane.showMessageDialog(frame, "Saldo GOPAY tidak cukup");
                     lanjut = false; // GA BISA LANJUT
@@ -256,13 +258,14 @@ public class GoSendScreen{
                 boolean berhasil = new GoSendController().insertGoSendTransaction(transaction);
                 if (berhasil) {
                     Gosend gosend = new Gosend();
-                    gosend.setTransactionID(new GoSendController().getTransactionID(transaction));
+                    gosend.setTransactionID(new GoController().getTransactionID(transaction));
 
                     int pickUp = Integer.parseInt(pickupField.getText());
                     int destination = Integer.parseInt(destinationField.getText());
                     gosend.setPickupLocation(pickUp);
                     gosend.setDestination(destination);
-
+                    gosend.setReceiverName(receiverNameField.getText());
+                    gosend.setItem(itemNameField.getText());
                     if (destination >= pickUp) {
                         gosend.setDistance(destination - pickUp);
                     } else {

@@ -4,6 +4,7 @@ import java.sql.Date;
 
 public class Driver extends Person {
     private String NIK;
+    private String username;
     private String password;
     private int driverID;
     private double income;
@@ -14,10 +15,11 @@ public class Driver extends Person {
 
     }
 
-    public Driver(String NIK, String password, int driverID, double income, Vehicle vehicle, String name,
+    public Driver(String NIK, String username, String password, int driverID, double income, Vehicle vehicle, String name,
             String address, String phoneNumber, Date birthDate, boolean available) {
         super(name, address, phoneNumber, birthDate);
         this.NIK = NIK;
+        this.username = username;
         this.password = password;
         this.driverID = driverID;
         this.income = income;
@@ -31,6 +33,14 @@ public class Driver extends Person {
 
     public void setNIK(String NIK) {
         this.NIK = NIK;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

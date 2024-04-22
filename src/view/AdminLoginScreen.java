@@ -10,18 +10,15 @@ import model.*;
 
 public class AdminLoginScreen {
 
+    private static final int FRAME_WIDTH = 300;
+    private static final int FRAME_HEIGHT = 200;
+
     private JTextField usernameField;
     private JPasswordField passwordField;
 
     public AdminLoginScreen() {
-        JFrame frame = new JFrame();
-        frame.setTitle("Login");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(300, 200);
-        frame.setLocationRelativeTo(null);
-
-        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JFrame frame = createFrame("Login");
+        JPanel mainPanel = createMainPanel();
 
         JLabel nikLabel = new JLabel("Username:");
         usernameField = new JTextField();
@@ -29,23 +26,31 @@ public class AdminLoginScreen {
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
 
-        JButton loginButton = new JButton("Login");
-        JButton backButton =  new JButton("Kembali");
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                new MainMenuScreen();
-            }
-        });
-        
-        
-        mainPanel.add(nikLabel);
-        mainPanel.add(usernameField);
-        mainPanel.add(passwordLabel);
-        mainPanel.add(passwordField);
-        mainPanel.add(loginButton);
-        mainPanel.add(backButton);
+        JButton loginButton = createLoginButton(frame);
+        JButton backButton = createBackButton(frame);
 
+        addComponentsToPanel(mainPanel, nikLabel, usernameField, passwordLabel, passwordField, loginButton, backButton);
+
+        frame.getContentPane().add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    private JFrame createFrame(String title) {
+        JFrame frame = new JFrame(title);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        frame.setLocationRelativeTo(null);
+        return frame;
+    }
+
+    private JPanel createMainPanel() {
+        JPanel mainPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        return mainPanel;
+    }
+
+    private JButton createLoginButton(JFrame frame) {
+        JButton loginButton = new JButton("Login");
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,8 +74,23 @@ public class AdminLoginScreen {
 
             }
         });
+        return loginButton;
+    }
 
-        frame.getContentPane().add(mainPanel);
-        frame.setVisible(true);
+    private JButton createBackButton(JFrame frame) {
+        JButton backButton =  new JButton("Kembali");
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frame.dispose();
+                new MainMenuScreen();
+            }
+        });
+        return backButton;
+    }
+
+    private void addComponentsToPanel(JPanel panel, Component... components) {
+        for (Component component : components) {
+            panel.add(component);
+        }
     }
 }
