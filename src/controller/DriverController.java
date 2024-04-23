@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import model.Cart;
 
 import model.Driver;
+import model.Gocar;
 import model.Gofood;
 import model.Goride;
 import model.Gosend;
@@ -127,6 +128,28 @@ public class DriverController {
             conn.disconnect();
         }
         return goride;
+    }
+
+    public Gocar getPendingGoCar(int transactionID) {
+       Gocar gocar = null;
+        try {
+            conn.connect();
+            String query = "SELECT * FROM gocar WHERE id_transaksi = " + transactionID;
+            Statement stmt = conn.con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) {
+                gocar = new Gocar();
+                gocar.setTransactionID(rs.getInt("id_transaksi"));
+                gocar.setTitikAntar(rs.getInt("id_region_antar"));
+                gocar.setTitikJemput(rs.getInt("id_region_jemput"));
+                gocar.setDistance(rs.getDouble("distance"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            conn.disconnect();
+        }
+        return gocar;
     }
     
     public Gofood getPendingGoFood(int transactionID) {
@@ -257,6 +280,22 @@ public class DriverController {
         try {
             conn.connect();
             String query = "UPDATE goride SET id_driver =" + driver.getDriverID() + ", delivery_fee = " + deliveryFee +" WHERE id_transaksi = " + goride.getTransactionID();
+            Statement stmt = conn.con.createStatement();
+            stmt.executeUpdate(query);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("error");
+            return false;
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    public boolean setDriverGocar(Gocar gocar, Driver driver, double deliveryFee){
+        try {
+            conn.connect();
+            String query = "UPDATE gocar SET id_driver =" + driver.getDriverID() + ", delivery_fee = " + deliveryFee +" WHERE id_transaksi = " + gocar.getTransactionID();
             Statement stmt = conn.con.createStatement();
             stmt.executeUpdate(query);
             return true;

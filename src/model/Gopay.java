@@ -13,14 +13,15 @@ public class Gopay extends Transaction {
         super(userID, serviceID, paymentMethod, voucher, totalPrice, totalDiscount, priceAfterDiscount, transactionDate, transactionID, adminFee, orderStatus);
         this.topUpBalance = topUpBalance;
     }
-
+    
+    public void setTopUpBalance(double topUpBalance) {
+        this.topUpBalance = topUpBalance;
+    }
+    
     public double getTopUpBalance() {
         return topUpBalance;
     }
 
-    public void setTopUpBalance(double topUpBalance) {
-        this.topUpBalance = topUpBalance;
-    }
 
     @Override
     public String toString() {

@@ -12,10 +12,12 @@ public class DriverScreen {
     private Driver driver;
     private Transaction pendingTransaction;
     private Goride pendingGoride;
+    private Gocar pendingGocar;
     private Gofood pendingGofood;
     private Gosend pendingGosend;
     private Transaction currentTransaction;
     private Goride currentGoride;
+    private Gocar currentGocar;
     private Gofood currentGofood;
     private Gosend currentGosend;
 
@@ -103,6 +105,9 @@ public class DriverScreen {
                 case Service.GORIDE:
                     showGoRidePage();
                     break;
+                case Service.GOCAR:
+                    showGoCarPage();
+                    break;
                 case Service.GOFOOD:
                     showGoFoodPage();
                     break;
@@ -110,6 +115,7 @@ public class DriverScreen {
                     showGoSendPage();
                     break;
                 default:
+                    System.out.println(pendingTransaction.getServiceID());
                     JOptionPane.showMessageDialog(frame, "Input Invalid", "Peringatan", JOptionPane.WARNING_MESSAGE);
             }
         } else {
@@ -150,6 +156,50 @@ public class DriverScreen {
                 new DriverController().updateIncomeDriver(driver, currentTransaction.getTotalPrice());
                 System.out.println(currentGoride.getTransactionID());
                 new DriverController().setDriverGoride(currentGoride, driver, currentTransaction.getTotalPrice());
+                new DriverController().changeTransactionState(currentTransaction);
+                driver.setAvailable(true);
+            }
+
+            JOptionPane.showMessageDialog(frame, "Berhasil proses");
+            frame.dispose();
+            showMainPage();
+        });
+
+        addButtonsToPanel(frame, mainPanel, backButton, updateButton);
+    }
+
+    private void showGoCarPage() {
+        pendingGocar = driver.getAvailable() ? new DriverController().getPendingGoCar(pendingTransaction.getTransactionID()) : currentGocar;
+
+        JPanel mainPanel = createMainPanel();
+        mainPanel.setLayout(new GridLayout(4, 2, 10, 10));
+
+        addLabelsToPanel(mainPanel, "Transaction ID:", Integer.toString(pendingTransaction.getTransactionID()));
+        addLabelsToPanel(mainPanel, "Pickup Location:", Integer.toString(pendingGocar.getTitikJemput()));
+        addLabelsToPanel(mainPanel, "Destination:", Integer.toString(pendingGocar.getTitikAntar()));
+        addLabelsToPanel(mainPanel, "Total Price:", Double.toString(pendingTransaction.getPriceAfterDiscount()));
+
+        JButton backButton = createBackButton();
+        JButton updateButton = createUpdateButton(driver.getAvailable() ? "Accept Order" : "Finish Order");
+
+        backButton.addActionListener(e -> {
+            frame.dispose();
+            showMainPage();
+        });
+
+        updateButton.addActionListener(e -> {
+            new DriverController().changeDriverState(driver);
+            if (driver.getAvailable()) {
+                currentTransaction = pendingTransaction;
+                currentGocar = pendingGocar;
+                new DriverController().changeTransactionState(pendingTransaction);
+                currentTransaction.setOrderStatus(OrderStatus.IN_PROGRESS);
+                currentGocar.setTransactionID(pendingTransaction.getTransactionID());
+                driver.setAvailable(false);
+            } else {
+                new DriverController().updateIncomeDriver(driver, currentTransaction.getTotalPrice());
+                System.out.println(currentGocar.getTransactionID());
+                new DriverController().setDriverGocar(currentGocar, driver, currentTransaction.getTotalPrice());
                 new DriverController().changeTransactionState(currentTransaction);
                 driver.setAvailable(true);
             }
